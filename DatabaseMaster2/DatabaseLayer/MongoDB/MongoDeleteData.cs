@@ -22,15 +22,6 @@ namespace DatabaseMaster2
             _databasename = DatabaseName;
         }
 
-        /// <summary>
-        /// use database name
-        /// 切换数据库名称
-        /// </summary>
-        public string SetDatabaseName
-        {
-            set => _databasename = value;
-            get => _databasename;
-        }
 
         /// <summary>
         /// delete data by key value

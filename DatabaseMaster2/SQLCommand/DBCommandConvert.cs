@@ -8,37 +8,37 @@ namespace DatabaseMaster2
     public class DBCommandConvert
     {
         //get nowdate function
-        public static String GetSQLDate(String Type)
+        public static String GetSQLDate(DatabaseType dbType)
         {
-            if (Type.Contains("MSSQL"))
+            if (dbType==DatabaseType.MSSQL)
                 return "getdate()";
-            else if (Type.Contains("Oracle"))
-                return "sysdate ";
-            else if (Type.Contains("MySQL"))
-                return "curdate() ";
-            else if (Type.Contains("Access"))
+            else if (dbType == DatabaseType.Oracle)
+                return "sysdate";
+            else if (dbType == DatabaseType.MYSQL)
+                return "curdate()";
+            else if (dbType == DatabaseType.OleDB)
                 return "now()";
             else
                 return "";
         }
 
-        public static String GetTopRecords(String Command, String TopRecord, DBCommandFactory type)
+        public static String GetTopRecords(String Command, String TopRecord, DatabaseType type)
         {
             switch (type)
             {
-                case DBCommandFactory.SQLServer:
+                case DatabaseType.MSSQL:
                     Command = Command.Replace("select", "select Top " + TopRecord);
                     return Command;
-                case DBCommandFactory.Oracle:
+                case DatabaseType.Oracle:
                     if (Command.Contains("where"))
                         Command += "and rownum <=" + TopRecord;
                     else
                         Command += "rownum <=" + TopRecord;
                     return Command;
-                case DBCommandFactory.MySQL:
+                case DatabaseType.MYSQL:
                     Command += "limit " + TopRecord;
                     return Command;
-                case DBCommandFactory.Access:
+                case DatabaseType.Access:
                     Command = Command.Replace("select", "Select Top " + TopRecord);
                     return Command;
                 default:

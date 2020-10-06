@@ -23,24 +23,16 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// use database name
-        /// 切换数据库名称
+        /// upload file
+        /// 上传文件
         /// </summary>
-        public string SetDatabaseName
-        {
-            set => _databasename = value;
-            get => _databasename;
-        }
-
-        /// <summary>
-        /// 删除数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
+        /// <param name="FilePath"></param>
         /// <returns></returns>
         public String UploadFile(String FilePath)
         {
+            if (System.IO.File.Exists(FilePath) == false)
+                throw new Exception("file path not found");
+
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -54,15 +46,13 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 删除数据
+        /// download file
+        /// 下载文件
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <returns></returns>
+        /// <param name="ID"></param>
+        /// <param name="FilePath"></param>
         public void DownloadFile(String ID, String FilePath)
         {
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -77,12 +67,10 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 删除数据
+        /// delete file
+        /// 删除文件
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <returns></returns>
+        /// <param name="ID"></param>
         public void DeleteFile(String ID)
         {
             //数据库连接

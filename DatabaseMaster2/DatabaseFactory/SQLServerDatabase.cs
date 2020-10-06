@@ -457,7 +457,7 @@ namespace DatabaseMaster2
         /// The parameter of output
         /// </returns>
         public  String[] ExecueStoreProCommand( String StoreProCommand,
-            ParameterClass[] ParameterIn, ParameterClass[] ParameterOut, Int32 Timeout = 30)
+            ParameterClass[] ParameterIn, ParameterOutClass[] ParameterOut, Int32 Timeout = 30)
         {
             if (conn == null)
             {
@@ -489,7 +489,9 @@ namespace DatabaseMaster2
             {
                 SqlParameter parameter = new SqlParameter
                 {
-                    ParameterName = ParameterOut[number].ParameterName, Direction = ParameterDirection.Output
+                    ParameterName = ParameterOut[number].ParameterName,
+                    SqlDbType = ParameterOut[number].SqlDbType,
+                    Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);
             }
@@ -552,6 +554,7 @@ namespace DatabaseMaster2
                 SqlParameter parameter = new SqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    SqlDbType = ParameterOut[number].SqlDbType,
                     Direction = ParameterDirection.ReturnValue
                 };
                 cmd.Parameters.Add(parameter);

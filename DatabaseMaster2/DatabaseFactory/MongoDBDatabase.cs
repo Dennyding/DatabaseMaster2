@@ -24,7 +24,7 @@ namespace DatabaseMaster2
         /// </summary>
         /// <param name="json"></param>
         /// <returns></returns>
-        private  Hashtable Json2Hashtable(string json)
+        private Hashtable Json2Hashtable(string json)
         {
             Regex r = new Regex(@"ObjectId\(\S+\)");
 
@@ -34,7 +34,7 @@ namespace DatabaseMaster2
             {
                 json = json.Replace(m1.Value, m1.Value.Replace("ObjectId(", "").Replace(")", ""));
             }
-           
+
 
             r = new Regex(@"ISODate\(\S+\)");
 
@@ -43,7 +43,7 @@ namespace DatabaseMaster2
             foreach (Match m1 in match)
             {
                 String v = m1.Value.Replace("ISODate(\"", "").Replace("\")", "");
-                    v =DateTime.Parse(v).ToString();
+                v = DateTime.Parse(v).ToString();
                 v = "\"" + v + "\"";
                 json = json.Replace(m1.Value, v);
 
@@ -189,7 +189,7 @@ namespace DatabaseMaster2
             {
                 return false;
             }
-          
+
 
             return true;
         }
@@ -204,8 +204,8 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-           session= conn.StartSession();
-           session.StartTransaction();
+            session = conn.StartSession();
+            session.StartTransaction();
         }
 
         /// <summary>
@@ -240,7 +240,7 @@ namespace DatabaseMaster2
             {
                 throw new Exception("StartTransaction has not initialize.");
             }
-
+            session.AbortTransaction();
             session = null;
         }
 
@@ -266,7 +266,7 @@ namespace DatabaseMaster2
         /// <param name="filterDefinition"></param>
         /// <param name="ColunmName"></param>
         /// <returns></returns>
-        public object GetSpeciaRecordValue(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition,String ColunmName)
+        public object GetSpeciaRecordValue(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, String ColunmName)
         {
             //command:DatabaseName|TableName|[Where JSON]|[Insert,Update,Delete]|[CloumnName][JSONData]
             if (conn == null)
@@ -274,15 +274,15 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-         
-            if (DatabaseName.Length==0||GetDatabaseName().Contains(DatabaseName) ==false)
+
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
 
-            if (database.ListCollectionNames().ToList().Contains(TableName) ==false)
+            if (database.ListCollectionNames().ToList().Contains(TableName) == false)
             {
                 throw new Exception("Collection Name is not exist in MongoDB Database.");
             }
@@ -307,13 +307,13 @@ namespace DatabaseMaster2
             return ht[ColunmName];
         }
 
-       /// <summary>
-       /// Check database connect
-       /// </summary>
-       /// <returns></returns>
+        /// <summary>
+        /// Check database connect
+        /// </summary>
+        /// <returns></returns>
         public object CheckConnect()
         {
-            
+
             if (conn == null)
             {
                 throw new Exception("Connection has not initialize.");
@@ -327,59 +327,6 @@ namespace DatabaseMaster2
                 return s.Count;
         }
 
-
-        /// <summary>
-        /// return a datareader from database
-        /// </summary>
-        /// <param name="DatabaseName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="filterDefinition"></param>
-        /// <param name="Timeout"></param>
-        /// <returns></returns>
-        public IDataReader GetDataReaderList(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 Timeout = 30)
-        {
-            IDataReader Value;
-
-            if (conn == null)
-            {
-                throw new Exception("Connection has not initialize.");
-            }
-
-          
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
-            {
-                throw new Exception("Database Name is not exist.");
-            }
-
-            IMongoDatabase database = conn.GetDatabase(DatabaseName);
-
-            if (database.ListCollectionNames().ToList().Contains(TableName) == false)
-            {
-                throw new Exception("Collection Name is not exist in MongoDB Database.");
-            }
-
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(TableName);
-
-            var filter = filterDefinition;
-
-
-            List<Hashtable> hr = new List<Hashtable>();
-
-            var cursor = collection.Find(filter).ToCursor();
-            foreach (var document in cursor.ToEnumerable())
-            {
-                Hashtable ht = Json2Hashtable(document.ToJson());
-                hr.Add(ht);
-            }
-
-            DataTable dt = HashTableToDataTable(hr);
-
-            Value = dt.CreateDataReader();
-
-            return Value;
-        }
-
-
         /// <summary>
         /// return a dataset from database
         /// </summary>
@@ -388,14 +335,14 @@ namespace DatabaseMaster2
         /// <param name="filterDefinition"></param>
         /// <param name="Timeout"></param>
         /// <returns></returns>
-        public DataSet GetDataSet(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, String SortName="", SortMode sortMode = SortMode.Ascending)
+        public DataSet GetDataSet(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (conn == null)
             {
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -455,7 +402,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -472,63 +419,9 @@ namespace DatabaseMaster2
             var filter = filterDefinition;
 
             long Number = collection.Find(filter).CountDocuments();
-          
-
-            return  Convert.ToInt64(Number);
-
-        }
-
-        /// <summary>
-        /// return a dataset from database
-        /// </summary>
-        /// <param name="DatabaseName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="filterDefinition"></param>
-        /// <returns></returns>
-        public List<Hashtable> GetHashtable(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            if (conn == null)
-            {
-                throw new Exception("Connection has not initialize.");
-            }
-
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
-            {
-                throw new Exception("Database Name is not exist.");
-            }
-
-            IMongoDatabase database = conn.GetDatabase(DatabaseName);
-
-            if (database.ListCollectionNames().ToList().Contains(TableName) == false)
-            {
-                throw new Exception("Collection Name is not exist in MongoDB Database.");
-            }
-
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(TableName);
-
-            var filter = filterDefinition;
 
 
-            List<Hashtable> hr = new List<Hashtable>();
-            IAsyncCursor<BsonDocument> cursor;
-
-            if (SortName == "")
-                cursor = collection.Find(filter).ToCursor();
-            else
-            {
-                SortDefinitionBuilder<BsonDocument> builderSort = Builders<BsonDocument>.Sort;
-                SortDefinition<BsonDocument> sort =
-                    sortMode == SortMode.Ascending ? builderSort.Ascending(SortName) : builderSort.Descending(SortName);
-                cursor = collection.Find(filter).Sort(sort).ToCursor();
-            }
-
-            foreach (var document in cursor.ToEnumerable())
-            {
-                Hashtable ht = Json2Hashtable(document.ToJson());
-                hr.Add(ht);
-            }
-
-            return hr;
+            return Convert.ToInt64(Number);
 
         }
 
@@ -547,7 +440,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -619,7 +512,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -650,7 +543,7 @@ namespace DatabaseMaster2
                 cursor = collection.Find(filter).Limit(LimitNumber).Sort(sort).ToCursor();
             }
 
-           
+
             foreach (var document in cursor.ToEnumerable())
             {
                 Hashtable ht = Json2Hashtable(document.ToJson());
@@ -665,61 +558,6 @@ namespace DatabaseMaster2
 
         }
 
-        /// <summary>
-        /// return a dataset from database
-        /// </summary>
-        /// <param name="DatabaseName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="filterDefinition"></param>
-        /// <returns></returns>
-        public List<Hashtable> GetTopRecordsHashtable(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            if (conn == null)
-            {
-                throw new Exception("Connection has not initialize.");
-            }
-
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
-            {
-                throw new Exception("Database Name is not exist.");
-            }
-
-            IMongoDatabase database = conn.GetDatabase(DatabaseName);
-
-            if (database.ListCollectionNames().ToList().Contains(TableName) == false)
-            {
-                throw new Exception("Collection Name is not exist in MongoDB Database.");
-            }
-
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(TableName);
-
-            var filter = filterDefinition;
-
-
-            List<Hashtable> hr = new List<Hashtable>();
-
-            IAsyncCursor<BsonDocument> cursor;
-
-            if (SortName == "")
-                cursor = collection.Find(filter).Limit(LimitNumber).ToCursor();
-            else
-            {
-                SortDefinitionBuilder<BsonDocument> builderSort = Builders<BsonDocument>.Sort;
-                SortDefinition<BsonDocument> sort =
-                    sortMode == SortMode.Ascending ? builderSort.Ascending(SortName) : builderSort.Descending(SortName);
-                cursor = collection.Find(filter).Limit(LimitNumber).Sort(sort).ToCursor();
-            }
-
-          
-            foreach (var document in cursor.ToEnumerable())
-            {
-                Hashtable ht = Json2Hashtable(document.ToJson());
-                hr.Add(ht);
-            }
-
-            return hr;
-
-        }
 
         /// <summary>
         /// return a dataset from database
@@ -729,14 +567,14 @@ namespace DatabaseMaster2
         /// <param name="filterDefinition"></param>
         /// <param name="Timeout"></param>
         /// <returns></returns>
-        public DataSet GetTopPageRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition,Int32 StartNumber, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
+        public DataSet GetTopPageRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 StartNumber, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (conn == null)
             {
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -781,61 +619,6 @@ namespace DatabaseMaster2
 
         }
 
-        /// <summary>
-        /// return a dataset from database
-        /// </summary>
-        /// <param name="DatabaseName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="filterDefinition"></param>
-        /// <returns></returns>
-        public List<Hashtable> GetTopPageRecordsHashtable(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 StartNumber, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            if (conn == null)
-            {
-                throw new Exception("Connection has not initialize.");
-            }
-
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
-            {
-                throw new Exception("Database Name is not exist.");
-            }
-
-            IMongoDatabase database = conn.GetDatabase(DatabaseName);
-
-            if (database.ListCollectionNames().ToList().Contains(TableName) == false)
-            {
-                throw new Exception("Collection Name is not exist in MongoDB Database.");
-            }
-
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(TableName);
-
-            var filter = filterDefinition;
-
-
-            List<Hashtable> hr = new List<Hashtable>();
-            IAsyncCursor<BsonDocument> cursor;
-
-            if (SortName == "")
-                cursor= collection.Find(filter).Skip(StartNumber - 1).Limit(LimitNumber).ToCursor();
-            else
-            {
-                SortDefinitionBuilder<BsonDocument> builderSort = Builders<BsonDocument>.Sort;
-                SortDefinition<BsonDocument> sort = 
-                    sortMode == SortMode.Ascending ? builderSort.Ascending(SortName) : builderSort.Descending(SortName);
-                cursor = collection.Find(filter).Skip(StartNumber - 1).Limit(LimitNumber).Sort(sort).ToCursor();
-            }
-               
-
-            foreach (var document in cursor.ToEnumerable())
-            {
-                Hashtable ht = Json2Hashtable(document.ToJson());
-                hr.Add(ht);
-            }
-
-            return hr;
-
-        }
-
 
         /// <summary>
         /// Insert new data
@@ -850,7 +633,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -877,7 +660,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -911,7 +694,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -937,7 +720,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -974,7 +757,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -1001,7 +784,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -1030,7 +813,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
@@ -1047,19 +830,19 @@ namespace DatabaseMaster2
         /// <param name="DatabaseName"></param>
         /// <param name="FilePath"></param>
         /// <returns></returns>
-        public String UploadFile(String DatabaseName,String FilePath)
+        public String UploadFile(String DatabaseName, String FilePath)
         {
             if (conn == null)
             {
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
 
-            if (File.Exists(FilePath)==false)
+            if (File.Exists(FilePath) == false)
             {
                 throw new Exception("File path is not exist.");
             }
@@ -1087,14 +870,14 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
             MongoDB.Driver.GridFS.GridFSBucket bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
-            Byte[] s= bucket.DownloadAsBytes(new ObjectId(id));
+            Byte[] s = bucket.DownloadAsBytes(new ObjectId(id));
 
             File.WriteAllBytes(FilePath, s);
 
@@ -1116,7 +899,7 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not initialize.");
             }
 
-            if (DatabaseName.Length == 0 || GetDatabaseName().Contains(DatabaseName) == false)
+            if (DatabaseName.Length == 0)
             {
                 throw new Exception("Database Name is not exist.");
             }

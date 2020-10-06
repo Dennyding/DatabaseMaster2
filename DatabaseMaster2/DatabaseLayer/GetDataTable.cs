@@ -19,10 +19,11 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 检查表中是否存在指定内容
+        /// check connect status
+        /// 检查连接状态
         /// </summary>
         /// <returns></returns>
-        public bool Status()
+        public Boolean Status()
         {
             try
             {
@@ -47,44 +48,20 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 得到表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-
-        /// <summary>
+        /// get all data
         /// 得到表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="OrderByName"></param>
         /// <returns></returns>
-        public IDataTable Data(string TableName, string OrderByName)
+        public IDataTable Data(String TableName, String OrderByName="", SortMode sortMode=SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
             sql.AddSelectTable(TableName);
             sql.AddSelectALLColumn();
-            sql.AddOrderBy(OrderByName);
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
 
 
             //数据库连接
@@ -99,35 +76,9 @@ namespace DatabaseMaster2
             return DT;
         }
 
-        /// <summary>
-        /// 得到指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, object Value)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            sql.AddWhere(WhereRelation.None, ColumnName, CommandComparison.Equals, Value);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
 
         /// <summary>
+        /// get data by filter
         /// 得到指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -135,14 +86,15 @@ namespace DatabaseMaster2
         /// <param name="Value"></param>
         /// <param name="OrderByName"></param>
         /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, object Value, string OrderByName)
+        public IDataTable Data(string TableName, string ColumnName, object Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
             sql.AddSelectTable(TableName);
             sql.AddSelectALLColumn();
             sql.AddWhere(WhereRelation.None, ColumnName, CommandComparison.Equals, Value);
-            sql.AddOrderBy(OrderByName, SortMode.Ascending);
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
 
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
@@ -157,6 +109,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get data by filter
         /// 得到指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -165,14 +118,15 @@ namespace DatabaseMaster2
         /// <param name="Value"></param>
         /// <returns></returns>
         public IDataTable Data(string TableName, string ColumnName, CommandComparison Comparison,
-            object Value)
+            object Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
             sql.AddSelectTable(TableName);
             sql.AddSelectALLColumn();
             sql.AddWhere(WhereRelation.None, ColumnName, (CommandComparison)Comparison, Value);
-
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
 
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
@@ -187,13 +141,14 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get data by filter
         /// 得到得到多个指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public IDataTable Data(string TableName, string[] ColumnName, object[] Value)
+        public IDataTable Data(string TableName, string[] ColumnName, object[] Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
@@ -202,7 +157,8 @@ namespace DatabaseMaster2
 
             for (var i = 0; i < ColumnName.Length; i++)
                 sql.AddWhere(WhereRelation.And, ColumnName[i], CommandComparison.Equals, Value[i]);
-
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
 
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
@@ -218,6 +174,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get data by filter
         /// 得到得到多个指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -226,7 +183,7 @@ namespace DatabaseMaster2
         /// <param name="Value"></param>
         /// <returns></returns>
         public IDataTable Data(string TableName, string[] ColumnName, CommandComparison[] Comparison,
-            object[] Value)
+            object[] Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
@@ -235,7 +192,8 @@ namespace DatabaseMaster2
 
             for (var i = 0; i < ColumnName.Length; i++)
                 sql.AddWhere(WhereRelation.And, ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
 
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
@@ -250,6 +208,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get data by filter
         /// 得到得到多个指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -286,7 +245,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到得到多个指定条件的多表中所有数据
+        /// get data by filter
+        /// 得到得到多个指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -325,7 +285,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到得到多个指定条件的多表中所有数据
+        /// get data by filter
+        /// 得到得到多个指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="Table1ColumnName"></param>
@@ -356,106 +317,10 @@ namespace DatabaseMaster2
             return DT;
         }
 
-        /// <summary>
-        /// 得到得到多个指定条件的表中所有数据，并排序
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="OrderByName"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] ColumnName, object[] Value, string OrderByName)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            sql.AddOrderBy(OrderByName);
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], CommandComparison.Equals, Value[i]);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
 
         /// <summary>
-        /// 得到得到多个指定条件的表中所有数据，并排序
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="OrderByName"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] ColumnName, CommandComparison[] Comparison,
-            object[] Value, string OrderByName)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            sql.AddOrderBy(OrderByName);
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// 得到得到多个指定条件的表中所有数据，并排序
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="OrderByName"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] ColumnName, CommandComparison[] Comparison,
-            object[] Value, string OrderByName, bool SortAscending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            sql.AddOrderBy(OrderByName, SortAscending ? SortMode.Ascending : SortMode.Descending);
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-
-        /// <summary>
-        /// 得到表中所有数据
+        /// get data by filter
+        /// 得到得到多个指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -485,6 +350,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// check data exist
         /// 检查表中是否存在指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -516,6 +382,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// check data exist
         /// 检查表中是否存在指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -551,6 +418,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// check data exist
         /// 检查表中是否存在指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -589,6 +457,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// execute procedure data exist
         /// 检查存储过程中是否存在指定内容
         /// </summary>
         /// <param name="ProcedureCommand"></param>
@@ -612,14 +481,15 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 检查存储过程中是否存在指定内容
+        /// execute procedure data
+        /// 执行存储过程中返回结果
         /// </summary>
         /// <param name="ProcedureCommand"></param>
         /// <param name="parameterin"></param>
         /// <param name="parameterout"></param>
         /// <returns></returns>
         public string[] Procedure(string ProcedureCommand, ParameterClass[] parameterin,
-            ParameterClass[] parameterout)
+            ParameterOutClass[] parameterout)
         {
             string[] value;
 
@@ -636,7 +506,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 检查存储过程中是否存在指定内容
+        /// execute procedure data
+        /// 执行存储过程中返回结果
         /// </summary>
         /// <param name="ProcedureCommand"></param>
         /// <param name="parameterin"></param>
@@ -660,6 +531,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// Execue Command
         /// 执行SQL语句
         /// </summary>
         /// <param name="ProcedureCommand"></param>
@@ -676,7 +548,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 执行SQL语句
+        /// execute procedure data
+        /// 执行存储过程中返回结果
         /// </summary>
         /// <param name="ProcedureCommand"></param>
         /// <returns></returns>
@@ -700,6 +573,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// execute procedure data
         /// 执行存储过程
         /// </summary>
         /// <param name="ProcedureCommand"></param>
@@ -717,7 +591,8 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 执行存储过程
+        /// execute procedure data
+        /// 执行存储过程中返回结果
         /// </summary>
         /// <param name="ProcedureCommand"></param>
         /// <param name="parameterin"></param>
@@ -744,7 +619,8 @@ namespace DatabaseMaster2
             return dt;
         }
 
-        /// <summary>
+        /// <summary>'
+        /// get first data by filter
         /// 得到指定条件的一个数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -773,6 +649,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get first data by filter
         /// 得到指定条件的一个数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -802,6 +679,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get count data by filter
         ///  得到指定条件的行计数数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -834,6 +712,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get count data by filter
         ///  得到指定条件的行计数数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -866,7 +745,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到行计数数据
+        /// get count data by filter
+        ///  得到指定条件的行计数数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -893,6 +773,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -925,6 +806,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -932,13 +814,14 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="RecordNumber"></param>
         /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, string OrderByName, int RecordNumber)
+        public IDataTable Data(string TableName, string ColumnName, int RecordNumber, String OrderByName= "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
             sql.AddSelectTable(TableName);
             sql.AddSelectColumn(ColumnName);
-            sql.AddOrderBy(OrderByName);
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
             sql.TopRecords = RecordNumber;
 
             //数据库连接
@@ -955,6 +838,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -965,13 +849,14 @@ namespace DatabaseMaster2
         /// <param name="RecordNumber"></param>
         /// <returns></returns>
         public IDataTable Data(string TableName, string ColumnName, string[] KeyColumnName,
-            object[] KeyValue, string OrderByName, int RecordNumber)
+            object[] KeyValue, int RecordNumber, String OrderByName= "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
             sql.AddSelectTable(TableName);
             sql.AddSelectColumn(ColumnName);
-            sql.AddOrderBy(OrderByName);
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
             sql.TopRecords = RecordNumber;
 
             for (var i = 0; i < KeyColumnName.Length; i++)
@@ -991,6 +876,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1002,13 +888,14 @@ namespace DatabaseMaster2
         /// <param name="RecordNumber"></param>
         /// <returns></returns>
         public IDataTable Data(string TableName, string ColumnName, string[] KeyColumnName,
-            CommandComparison[] Comparison, object[] KeyValue, string OrderByName, int RecordNumber)
+            CommandComparison[] Comparison, object[] KeyValue,  int RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
             sql.AddSelectTable(TableName);
             sql.AddSelectColumn(ColumnName);
-            sql.AddOrderBy(OrderByName);
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
             sql.TopRecords = RecordNumber;
 
             for (var i = 0; i < KeyColumnName.Length; i++)
@@ -1029,6 +916,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1063,6 +951,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1099,6 +988,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get columns data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1129,6 +1019,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get columns data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1159,18 +1050,20 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        ///  得到表中一列数据
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
         /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName)
+        public IDataTable ColumnData(string TableName, List<string> ColumnName, String OrderByName= "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();
             sql.AddSelectTable(TableName);
             sql.AddSelectColumn(ColumnName);
-
+            if (String.IsNullOrEmpty(OrderByName)==false)
+                sql.AddOrderBy(OrderByName, sortMode);
 
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
@@ -1184,36 +1077,10 @@ namespace DatabaseMaster2
             return DT;
         }
 
-        /// <summary>
-        ///  得到表中一列数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="OrderName"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, string OrderName)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.AddOrderBy(OrderName);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1243,7 +1110,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1274,7 +1142,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1305,7 +1174,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1338,7 +1208,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>

@@ -9,16 +9,43 @@ using Oracle.ManagedDataAccess.Client;
 
 namespace DatabaseMaster2
 {
-
+    /// <summary>
+    /// input parameter
+    /// 输入参数
+    /// </summary>
     public struct ParameterClass
     {
         public String ParameterName;
         public object Value;
     }
 
+    /// <summary>
+    /// output parameter
+    /// 输出参数
+    /// </summary>
+    public struct ParameterOutClass
+    {
+        public String ParameterName;
+        public DbType SqliteDbType;
+        public SqlDbType SqlDbType;
+        public MySqlDbType MySqlDbType;
+        public OracleDbType OracleDbType;
+        public NpgsqlDbType NpgsqlDbType;
+        public object Value;
+    }
+
+    /// <summary>
+    /// return parameter
+    /// 返回参数
+    /// </summary>
     public struct ParameterReturnClass
     {
         public String ParameterName;
+        public DbType SqliteDbType;
+        public SqlDbType SqlDbType;
+        public MySqlDbType MySqlDbType;
+        public OracleDbType OracleDbType;
+        public NpgsqlDbType NpgsqlDbType;
         public object Value;
     }
 
@@ -149,7 +176,7 @@ namespace DatabaseMaster2
          /// The parameter of output
          /// </returns>
          String[] ExecueStoreProCommand( String StoreProCommand,
-            ParameterClass[] ParameterIn, ParameterClass[] ParameterOut, Int32 Timeout = 30);
+            ParameterClass[] ParameterIn, ParameterOutClass[] ParameterOut, Int32 Timeout = 30);
 
          /// <summary>
          /// Execue sql Command With Parameter

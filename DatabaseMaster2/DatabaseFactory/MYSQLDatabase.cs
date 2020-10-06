@@ -452,7 +452,7 @@ namespace DatabaseMaster2
         /// The parameter of output
         /// </returns>
         public String[] ExecueStoreProCommand(String StoreProCommand,
-            ParameterClass[] ParameterIn, ParameterClass[] ParameterOut, Int32 Timeout = 30)
+            ParameterClass[] ParameterIn, ParameterOutClass[] ParameterOut, Int32 Timeout = 30)
         {
             if (conn == null)
             {
@@ -486,6 +486,7 @@ namespace DatabaseMaster2
                 MySqlParameter parameter = new MySqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    MySqlDbType = ParameterOut[number].MySqlDbType,
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);
@@ -550,6 +551,7 @@ namespace DatabaseMaster2
                 MySqlParameter parameter = new MySqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    MySqlDbType = ParameterOut[number].MySqlDbType,
                     Direction = ParameterDirection.ReturnValue
                 };
                 cmd.Parameters.Add(parameter);

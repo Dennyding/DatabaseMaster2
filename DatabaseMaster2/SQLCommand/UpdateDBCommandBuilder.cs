@@ -15,7 +15,7 @@ namespace DatabaseMaster2
         private List<String> condition = new List<String>();
         private String Condition = "";
 
-        private DBCommandFactory DatabaseType;
+        private DatabaseType DatabaseType;
 
         /// <summary>
         /// set default database
@@ -23,14 +23,14 @@ namespace DatabaseMaster2
         /// <param name="DataModule"></param>
         public UpdateDBCommandBuilder()
         {
-            DatabaseType = DBCommandFactory.SQLServer;
+            DatabaseType = DatabaseType.MSSQL;
         }
 
         /// <summary>
         /// set database
         /// </summary>
         /// <param name="DataModule"></param>
-        public UpdateDBCommandBuilder(DBCommandFactory DataModule)
+        public UpdateDBCommandBuilder(DatabaseType DataModule)
         {
             DatabaseType = DataModule;
         }
@@ -56,19 +56,11 @@ namespace DatabaseMaster2
         /// <summary>
         /// Set database type
         /// </summary>
-        public String DatabaseModule
+        public DatabaseType DatabaseModule
         {
             set
             {
-                if (value.Contains("MSSQL"))
-                    DatabaseType = DBCommandFactory.SQLServer;
-                else if (value.Contains("MYSQL"))
-                    DatabaseType = DBCommandFactory.MySQL;
-                else if (value.Contains("Oracle"))
-                    DatabaseType = DBCommandFactory.Oracle;
-                else
-                    DatabaseType = DBCommandFactory.Access;
-
+                DatabaseType = value;
             }
         }
 

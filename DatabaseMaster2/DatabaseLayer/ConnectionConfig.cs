@@ -72,7 +72,8 @@ namespace DatabaseMaster2
             if (string.IsNullOrEmpty(s))
                 throw new Exception("XML Attribute not found");
 
-            s = StringEncrypt.DataDecrypt(encryptType, s);
+            if (encryptType != StringEncrypt.EncryptType.None)
+                s = StringEncrypt.DataDecrypt(encryptType, s);
             return s;
         }
 
@@ -90,8 +91,8 @@ namespace DatabaseMaster2
             String s = XmlStream.getXmlValue(fileName, xmlElement, xmlAttribute);
             if (string.IsNullOrEmpty(s))
                 throw  new Exception("XML Attribute not found");
- 
-            s = StringEncrypt.DataDecrypt(encryptType, s);
+            if (encryptType != StringEncrypt.EncryptType.None)
+                s = StringEncrypt.DataDecrypt(encryptType, s);
             return s;
         }
     }
@@ -99,7 +100,7 @@ namespace DatabaseMaster2
     public class ConnectionConfig
     {
         private String _connString;
-        private DbType _dbType;
+        private DatabaseType _dbType;
         private Boolean _isAutoclose=true;
         private Int32 _Timeout=30;
         private String _DatabaseName;
@@ -124,7 +125,7 @@ namespace DatabaseMaster2
         /// database type
         /// 数据库类型
         /// </summary>
-        public DbType DBType
+        public DatabaseType DBType
         {
             get => _dbType;
             set => _dbType = value;
@@ -151,14 +152,5 @@ namespace DatabaseMaster2
             set => _isAutoclose = value;
         }
 
-        /// <summary>
-        /// set database name
-        /// 设置数据库名称，NOSQL使用
-        /// </summary>
-        public String DatabaseName
-        {
-            get => _DatabaseName;
-            set => _DatabaseName = value;
-        }
     }
 }

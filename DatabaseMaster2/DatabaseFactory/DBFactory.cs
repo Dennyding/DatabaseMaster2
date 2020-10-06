@@ -5,35 +5,38 @@ using System.Text;
 
 namespace DatabaseMaster2
 {
-   public enum DbType
+   public enum DatabaseType
     {
         MSSQL=1,
         MYSQL=2,
         Oracle=3,
         OleDB=4,
         SQLite=5,
-        PostgreSQL=6
+        PostgreSQL=6,
+        Access = 7
     }
 
     public class DBFactory
     {
-        public static DatabaseInterface CreateDatabase(DbType dbType,String ConnString)
+        public static DatabaseInterface CreateDatabase(DatabaseType dbType,String ConnString)
         {
           
             switch (dbType)
             {
-                case DbType.MSSQL:
+                case DatabaseType.MSSQL:
                     return new SQLServerDatabase(ConnString, true);
-                case DbType.MYSQL:
+                case DatabaseType.MYSQL:
                     return new MYSQLDatabase(ConnString, true);
-                case DbType.Oracle:
+                case DatabaseType.Oracle:
                     return new OracleDatabase(ConnString, true);
-                case DbType.OleDB:
+                case DatabaseType.OleDB:
                     return new OleDBDatabase(ConnString, true);
-                case DbType.SQLite:
+                case DatabaseType.SQLite:
                     return new SQLiteDatabase(ConnString, true);
-                case DbType.PostgreSQL:
+                case DatabaseType.PostgreSQL:
                     return new PostgreSQL(ConnString, true);
+                case DatabaseType.Access:
+                    return new OleDBDatabase(ConnString, true);
                 default:
                     return new SQLServerDatabase(ConnString, true);
             }

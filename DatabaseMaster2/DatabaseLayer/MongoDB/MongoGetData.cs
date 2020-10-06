@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Collections;
+using System.Net.Http.Headers;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -23,15 +24,6 @@ namespace DatabaseMaster2
             _databasename = DatabaseName;
         }
 
-        /// <summary>
-        /// use database name
-        /// 切换数据库名称
-        /// </summary>
-        public string SetDatabaseName
-        {
-            set => _databasename = value;
-            get => _databasename;
-        }
 
         /// <summary>
         /// check connect status
@@ -84,6 +76,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get all data
         /// 得到表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -111,6 +104,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get data by filter
         /// 得到指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -122,9 +116,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, String ColumnName, Object Value,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -143,6 +134,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get data by filter
         /// 得到指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -172,6 +164,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get data by filter
         /// 得到指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -207,6 +200,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get data by filter
         /// 得到指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -220,8 +214,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, String[] ColumnName, CommandComparison[] Comparison,
             Object[] Value, WhereRelation[] relation, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
                 ColumnName.Length != relation.Length)
             {
@@ -243,162 +235,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 得到表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String OrderByName = "",
-            SortMode sortMode = SortMode.Ascending)
-        {
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetHashtable(_databasename, TableName, new BsonDocument(),
-                OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String ColumnName, Object Value,
-            String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            List<Hashtable> ds = _database.GetHashtable(_databasename, TableName,
-                MongoDBOP.GetFilterOP(ColumnName, Value, CommandComparison.Equals), OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-
-        /// <summary>
-        /// 得到指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String ColumnName, Object Value,
-            CommandComparison Comparison, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetHashtable(_databasename, TableName,
-                MongoDBOP.GetFilterOP(ColumnName, Value, Comparison), OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String[] ColumnName, Object[] Value,
-            String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetHashtable(_databasename, TableName,
-                MongoDBOP.GetWhere(ColumnName, Value), OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="relation"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String[] ColumnName,
-            CommandComparison[] Comparison, Object[] Value, WhereRelation[] relation, String OrderByName = "",
-            SortMode sortMode = SortMode.Ascending)
-        {
-
-
-            if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
-                ColumnName.Length != relation.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetHashtable(_databasename, TableName,
-                MongoDBOP.GetWhere(ColumnName, Value, Comparison, relation), OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到指定条件的表中所有数据
+        /// check data exist by filter
+        ///  检查表中是否存在指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -406,8 +244,6 @@ namespace DatabaseMaster2
         /// <returns></returns>
         public Boolean Exist(String TableName, String ColumnName, Object Value)
         {
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -425,7 +261,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 检查表中是否存在指定内容
+        /// check data exist by filter
+        ///  检查表中是否存在指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -435,8 +272,6 @@ namespace DatabaseMaster2
         public Boolean Exist(String TableName, String ColumnName,
             CommandComparison Comparison, Object Value)
         {
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -454,7 +289,8 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// 检查表中是否存在指定内容
+        /// check data exist by filter
+        ///  检查表中是否存在指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -462,8 +298,6 @@ namespace DatabaseMaster2
         /// <returns></returns>
         public Boolean Exist(String TableName, String[] ColumnName, Object[] Value)
         {
-
-
             if (ColumnName.Length != Value.Length)
             {
                 throw new Exception("Column number not Equals Value number");
@@ -487,7 +321,8 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 检查表中是否存在指定内容
+        /// check data exist by filter
+        ///  检查表中是否存在指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -498,8 +333,6 @@ namespace DatabaseMaster2
         public Boolean Exist(String TableName, String[] ColumnName,
             CommandComparison[] Comparison, Object[] Value, WhereRelation[] relation)
         {
-
-
             if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
                 ColumnName.Length != relation.Length)
             {
@@ -525,6 +358,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get one data by filter
         /// 得到指定条件的一个数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -535,8 +369,6 @@ namespace DatabaseMaster2
         public Object First(String TableName, String ColumnName, String KeyColumnName, Object KeyValue,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -552,6 +384,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get one data by filter
         /// 得到指定条件的一个数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -562,8 +395,6 @@ namespace DatabaseMaster2
         public Object First(String TableName, String ColumnName, String[] KeyColumnName,
             Object[] KeyValue, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (KeyColumnName.Length != KeyValue.Length)
             {
                 throw new Exception("Column number not Equals Value number");
@@ -584,6 +415,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get count by filter
         /// 得到指定条件的行计数数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -595,8 +427,6 @@ namespace DatabaseMaster2
         public Object First(String TableName, String ColumnName, String[] KeyColumnName,
             Object[] KeyValue, Boolean CountNumber)
         {
-
-
             if (KeyColumnName.Length != KeyValue.Length)
             {
                 throw new Exception("Column number not Equals Value number");
@@ -617,6 +447,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get count by filter
         /// 得到指定条件的行计数数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -631,8 +462,6 @@ namespace DatabaseMaster2
             CommandComparison[] Comparison, Object[] KeyValue, WhereRelation[] relation,
             Boolean CountNumber)
         {
-
-
             if (KeyColumnName.Length != KeyValue.Length && KeyColumnName.Length != Comparison.Length &&
                 KeyColumnName.Length != relation.Length)
             {
@@ -654,6 +483,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get count by filter
         /// 得到指定条件的行计数数据
         /// </summary>
         /// <param name="TableName"></param>
@@ -662,8 +492,6 @@ namespace DatabaseMaster2
         /// <returns></returns>
         public Object First(String TableName, String ColumnName, Boolean CountNumber)
         {
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -678,6 +506,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -690,9 +519,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, Int32 RecordNumber, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
-
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -709,6 +535,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -721,9 +548,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, String ColumnName, Object Value, Int32 RecordNumber,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -742,6 +566,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -772,6 +597,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -784,8 +610,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, String[] ColumnName, Object[] Value,
             Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (ColumnName.Length != Value.Length)
             {
                 throw new Exception("Column number not Equals Value number");
@@ -808,6 +632,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get recordnumber data by filter
         /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -823,8 +648,6 @@ namespace DatabaseMaster2
             Object[] Value, WhereRelation[] relation, Int32 RecordNumber, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
                 ColumnName.Length != relation.Length)
             {
@@ -845,168 +668,9 @@ namespace DatabaseMaster2
             return DT;
         }
 
-        /// <summary>
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, Int32 RecordNumber,
-            String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            List<Hashtable> ds = _database.GetTopRecordsHashtable(_databasename, TableName,
-                new BsonDocument(), RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
 
         /// <summary>
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String ColumnName, Object Value,
-            Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            List<Hashtable> ds = _database.GetTopRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetFilterOP(ColumnName, Value, CommandComparison.Equals), RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String ColumnName,
-            CommandComparison Comparison, Object Value, Int32 RecordNumber, String OrderByName = "",
-            SortMode sortMode = SortMode.Ascending)
-        {
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetTopRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetFilterOP(ColumnName, Value, Comparison), RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-        /// <summary>
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String[] ColumnName, Object[] Value,
-            Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetTopRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetWhere(ColumnName, Value), RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="relation"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String[] ColumnName,
-            CommandComparison[] Comparison, Object[] Value, WhereRelation[] relation, Int32 RecordNumber,
-            String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-            if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
-                ColumnName.Length != relation.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetTopRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetWhere(ColumnName, Value, Comparison, relation), RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-        /// <summary>
+        /// get page data by filter
         /// 得到指定数据的分页指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1020,9 +684,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, Int32 StartNumber, Int32 RecordNumber,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -1039,6 +700,7 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get page data by filter
         /// 得到指定数据的分页指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1052,9 +714,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, String ColumnName, Object Value,
             Int32 StartNumber, Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -1073,6 +732,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get page data by filter
         /// 得到指定数据的分页指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1105,6 +765,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get page data by filter
         /// 得到指定数据的分页指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1118,8 +779,6 @@ namespace DatabaseMaster2
         public IDataTable Data(String TableName, String[] ColumnName, Object[] Value,
             Int32 StartNumber, Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (ColumnName.Length != Value.Length)
             {
                 throw new Exception("Column number not Equals Value number");
@@ -1142,6 +801,7 @@ namespace DatabaseMaster2
 
 
         /// <summary>
+        /// get page data by filter
         /// 得到指定数据的分页指定内容
         /// </summary>
         /// <param name="TableName"></param>
@@ -1158,8 +818,6 @@ namespace DatabaseMaster2
             CommandComparison[] Comparison, Object[] Value, WhereRelation[] relation, Int32 StartNumber,
             Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
                 ColumnName.Length != relation.Length)
             {
@@ -1180,185 +838,17 @@ namespace DatabaseMaster2
             return DT;
         }
 
-        /// <summary>
-        /// 得到指定数据的分页指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="StartNumber"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, Int32 StartNumber,
-            Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            List<Hashtable> ds = _database.GetTopPageRecordsHashtable(_databasename, TableName,
-                new BsonDocument(), StartNumber, RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
 
         /// <summary>
-        /// 得到指定数据的分页指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="StartNumber"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String ColumnName, Object Value,
-            Int32 StartNumber, Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetTopPageRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetFilterOP(ColumnName, Value, CommandComparison.Equals), StartNumber, RecordNumber, OrderByName,
-                sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-
-        /// <summary>
-        /// 得到指定数据的分页指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="StartNumber"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String ColumnName,
-            CommandComparison Comparison, Object Value, Int32 StartNumber, Int32 RecordNumber, String OrderByName = "",
-            SortMode sortMode = SortMode.Ascending)
-        {
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetTopPageRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetFilterOP(ColumnName, Value, Comparison), StartNumber, RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到指定数据的分页指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="StartNumber"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String[] ColumnName,
-            Object[] Value, Int32 StartNumber, Int32 RecordNumber, String OrderByName = "",
-            SortMode sortMode = SortMode.Ascending)
-        {
-
-
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetTopPageRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetWhere(ColumnName, Value), StartNumber, RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-
-        /// <summary>
-        /// 得到指定数据的分页指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="relation"></param>
-        /// <param name="StartNumber"></param>
-        /// <param name="RecordNumber"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public List<Hashtable> HashTable(String TableName, String[] ColumnName,
-            CommandComparison[] Comparison, Object[] Value, WhereRelation[] relation, Int32 StartNumber,
-            Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-
-
-            if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
-                ColumnName.Length != relation.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            List<Hashtable> ds = _database.GetTopPageRecordsHashtable(_databasename, TableName,
-                MongoDBOP.GetWhere(ColumnName, Value, Comparison, relation), StartNumber, RecordNumber, OrderByName, sortMode);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return ds;
-        }
-
-
-        /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到表中列满足条件的数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable HashTable(String TableName, List<String> IncludeColumnName,
+        public IDataTable Data(String TableName, List<String> IncludeColumnName,
             List<String> ExcludeColumnName, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
 
@@ -1380,7 +870,8 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到表中列满足条件的数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1393,8 +884,6 @@ namespace DatabaseMaster2
             List<String> ExcludeColumnName, String MatchColumn, Object MatchValue, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
-
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -1413,7 +902,8 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到表中列满足条件的数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1445,7 +935,8 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到表中列满足条件的数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1458,8 +949,6 @@ namespace DatabaseMaster2
             List<String> ExcludeColumnName, String[] MatchColumn, Object[] MatchValue, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (MatchColumn.Length != MatchValue.Length)
             {
                 throw new Exception("Column number not Equals Value number");
@@ -1483,7 +972,8 @@ namespace DatabaseMaster2
 
 
         /// <summary>
-        /// 得到表中一列满足条件的数据
+        /// get columns data by filter
+        /// 得到表中列满足条件的数据
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
@@ -1498,8 +988,6 @@ namespace DatabaseMaster2
             List<String> ExcludeColumnName, String[] MatchColumn, CommandComparison[] Comparison, Object[] MatchValue,
             WhereRelation[] relation, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
-
-
             if (MatchColumn.Length != MatchValue.Length && MatchColumn.Length != Comparison.Length &&
                 MatchColumn.Length != relation.Length)
             {

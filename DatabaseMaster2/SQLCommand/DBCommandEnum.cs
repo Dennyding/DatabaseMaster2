@@ -4,18 +4,6 @@ using System.Text;
 
 namespace DatabaseMaster2
 {
-    /// <summary>
-    /// Database Type
-    /// </summary>
-    public enum DBCommandFactory
-    {
-        SQLServer=1,
-        MySQL=2,
-        Oracle=3,
-        Access=4,
-        DB2=5,
-        SQLite = 6,
-    }
 
     /// <summary>
     /// Insert mode

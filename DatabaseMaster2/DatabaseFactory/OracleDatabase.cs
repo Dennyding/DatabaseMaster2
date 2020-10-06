@@ -453,7 +453,7 @@ namespace DatabaseMaster2
         /// The parameter of output
         /// </returns>
         public String[] ExecueStoreProCommand( String StoreProCommand,
-            ParameterClass[] ParameterIn, ParameterClass[] ParameterOut, Int32 Timeout = 30)
+            ParameterClass[] ParameterIn, ParameterOutClass[] ParameterOut, Int32 Timeout = 30)
         {
             if (conn == null)
             {
@@ -479,6 +479,7 @@ namespace DatabaseMaster2
                 OracleParameter parameter = new OracleParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    OracleDbType = ParameterOut[number].OracleDbType,
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);
@@ -546,6 +547,7 @@ namespace DatabaseMaster2
                 OracleParameter parameter = new OracleParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    OracleDbType = ParameterOut[number].OracleDbType,
                     Direction = ParameterDirection.ReturnValue
                 };
                 cmd.Parameters.Add(parameter);

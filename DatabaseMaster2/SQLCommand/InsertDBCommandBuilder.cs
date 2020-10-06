@@ -17,7 +17,7 @@ namespace DatabaseMaster2
         private String selectcommand;
         private Boolean selectidentity;
 
-        private DBCommandFactory DatabaseType;
+        private DatabaseType DatabaseType;
 
         /// <summary>
         /// set default database
@@ -25,14 +25,14 @@ namespace DatabaseMaster2
         /// <param name="DataModule"></param>
         public InsertDBCommandBuilder()
         {
-            DatabaseType = DBCommandFactory.SQLServer;
+            DatabaseType = DatabaseType.MSSQL;
         }
 
         /// <summary>
         /// set database
         /// </summary>
         /// <param name="DataModule"></param>
-        public InsertDBCommandBuilder(DBCommandFactory DataModule)
+        public InsertDBCommandBuilder(DatabaseType DataModule)
         {
             DatabaseType = DataModule;
         }
@@ -109,20 +109,11 @@ namespace DatabaseMaster2
         /// <summary>
         /// Set database type
         /// </summary>
-        public String DatabaseModule
+        public DatabaseType DatabaseModule
         {
             set
             {
-                if (value.Contains("MSSQL"))
-                    DatabaseType = DBCommandFactory.SQLServer;
-                else if (value.Contains("MYSQL"))
-                    DatabaseType = DBCommandFactory.MySQL;
-                else if (value.Contains("Oracle"))
-                    DatabaseType = DBCommandFactory.Oracle;
-                else if (value.Contains("SQLite"))
-                    DatabaseType = DBCommandFactory.SQLite;
-                else
-                    DatabaseType = DBCommandFactory.Access;
+                DatabaseType = value;
 
             }
         }
@@ -193,17 +184,23 @@ namespace DatabaseMaster2
             {
                 switch (DatabaseType)
                 {
-                    case DBCommandFactory.SQLServer:
+                    case DatabaseType.MSSQL:
                         Command += ";select @@identity";
                 	break;
-                    case DBCommandFactory.MySQL:
+                    case DatabaseType.MYSQL:
                         Command += ";select LAST_INSERT_ID()";
                     break;
-                    case DBCommandFactory.SQLite:
+                    case DatabaseType.SQLite:
                         Command += ";select last_insert_rowid();";
                         break;
-                    case DBCommandFactory.Access:
+                    case DatabaseType.Access:
                         Command += ";select LAST_INSERT_ID()";
+                        break;
+                    case DatabaseType.PostgreSQL:
+                        Command += " returning id into id_;";
+                        break;
+                    case DatabaseType.Oracle:
+                        Command += " RETURNING ID INTO newID;";
                         break;
                 }
 

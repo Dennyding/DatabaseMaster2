@@ -84,7 +84,7 @@ namespace DatabaseMaster2
         /// <param name="Value"></param>
         /// <param name="ReturnID"></param>
         /// <returns></returns>
-        public object Data(string TableName, string[] ColumnName, string DatabaseModule, object[] Value,
+        public object Data(string TableName, string[] ColumnName, DatabaseType DatabaseModule, object[] Value,
             bool ReturnID)
         {
             //sql生成
@@ -117,7 +117,7 @@ namespace DatabaseMaster2
         /// <param name="Value"></param>
         /// <param name="ReturnID"></param>
         /// <returns></returns>
-        public object Data(string TableName, string DatabaseModule, object[] Value, bool ReturnID)
+        public object Data(string TableName, DatabaseType DatabaseModule, object[] Value, bool ReturnID)
         {
             //sql生成
             var sql = new InsertDBCommandBuilder();

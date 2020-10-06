@@ -213,7 +213,6 @@ namespace DatabaseMaster2
         /// DataTable to Hashtable
         /// 返回Hashtable数组
         /// </summary>
-        /// <param name="RowsIndex"></param>
         /// <returns></returns>
         public Hashtable[] ToHashTable()
         {
@@ -235,6 +234,39 @@ namespace DatabaseMaster2
                     }
                 }
               
+                return hash;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// DataTable to Hashtable
+        /// 返回Hashtable数组
+        /// </summary>
+        /// <returns></returns>
+        public List<Hashtable> ToListHashTable()
+        {
+            try
+            {
+                if (_table.Rows.Count == 0)
+                    return null;
+                List<Hashtable> hash = new List<Hashtable>();
+
+                for (int i = 0; i < _table.Rows.Count; i++)
+                {
+                    DataRow row = _table.Rows[i];
+
+                    hash[i] = new Hashtable();
+
+                    for (int j = 0; j < row.Table.Columns.Count; j++)
+                    {
+                        hash[i].Add(row.Table.Columns[j].ColumnName, row[j]);
+                    }
+                }
+
                 return hash;
             }
             catch

@@ -458,7 +458,7 @@ namespace DatabaseMaster2
         /// The parameter of output
         /// </returns>
         public  String[] ExecueStoreProCommand( String StoreProCommand,
-            ParameterClass[] ParameterIn, ParameterClass[] ParameterOut, Int32 Timeout = 30)
+            ParameterClass[] ParameterIn, ParameterOutClass[] ParameterOut, Int32 Timeout = 30)
         {
             if (conn == null)
             {
@@ -484,6 +484,7 @@ namespace DatabaseMaster2
                 NpgsqlParameter parameter = new NpgsqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    NpgsqlDbType = ParameterOut[number].NpgsqlDbType,
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);
@@ -552,6 +553,7 @@ namespace DatabaseMaster2
                 NpgsqlParameter parameter = new NpgsqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    NpgsqlDbType = ParameterOut[number].NpgsqlDbType,
                     Direction = ParameterDirection.ReturnValue
                 };
                 cmd.Parameters.Add(parameter);

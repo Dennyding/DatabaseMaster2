@@ -437,7 +437,7 @@ namespace DatabaseMaster2
         /// The parameter of output
         /// </returns>
         public  String[] ExecueStoreProCommand( String StoreProCommand,
-            ParameterClass[] ParameterIn, ParameterClass[] ParameterOut, Int32 Timeout = 30)
+            ParameterClass[] ParameterIn, ParameterOutClass[] ParameterOut, Int32 Timeout = 30)
         {
             if (conn == null)
             {
@@ -470,6 +470,7 @@ namespace DatabaseMaster2
                 OleDbParameter parameter = new OleDbParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
+                    DbType = ParameterOut[number].SqliteDbType,
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);

@@ -22,15 +22,6 @@ namespace DatabaseMaster2
             _databasename = DatabaseName;
         }
 
-        /// <summary>
-        /// use database name
-        /// 切换数据库名称
-        /// </summary>
-        public string SetDatabaseName
-        {
-            set => _databasename = value;
-            get => _databasename;
-        }
 
         /// <summary>
         /// insert new data
@@ -41,8 +32,6 @@ namespace DatabaseMaster2
         /// <param name="Value"></param>
         public void Data(String TableName, String[] ColumnName, Object[] Value)
         {
-
-
             if (ColumnName.Length != Value.Length)
             {
                 throw new Exception("Column number not Equals Value number");

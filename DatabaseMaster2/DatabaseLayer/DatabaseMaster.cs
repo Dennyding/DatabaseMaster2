@@ -10,37 +10,75 @@ namespace DatabaseMaster2
     {
         private ConnectionConfig _connectionConfig;
         private DatabaseInterface database;
-        /// <summary>
-        /// delete operate
-        /// 删除操作
-        /// </summary>
-        public DatabaseDeleteData Deleteable;
-        /// <summary>
-        /// insert operate
-        /// 插入操作
-        /// </summary>
-        public DatabaseInsertData Insertable;
-        /// <summary>
-        /// update operate
-        /// 更新操作
-        /// </summary>
-        public DatabaseUpdateData Updateable;
-        /// <summary>
-        /// select operate
-        /// 查询操作
-        /// </summary>
-        public DatabaseGetData Queryable;
-
 
         public DatabaseMaster(ConnectionConfig config)
         {
             _connectionConfig = config;
 
             database = DBFactory.CreateDatabase(_connectionConfig.DBType, _connectionConfig.ConnectionString);
-            Deleteable = new DatabaseDeleteData(_connectionConfig, database);
-            Insertable = new DatabaseInsertData(_connectionConfig, database);
-            Updateable = new DatabaseUpdateData(_connectionConfig, database);
-            Queryable = new DatabaseGetData(_connectionConfig, database);
+        }
+
+        /// <summary>
+        /// open connect
+        /// 长连接数据库
+        /// </summary>
+        public void Connect()
+        {
+            database.Open();
+        }
+
+
+        /// <summary>
+        /// close connect
+        /// 长关闭数据库
+        /// </summary>
+        public void Close()
+        {
+            database.Close();
+        }
+
+        /// <summary>
+        /// Query data
+        /// 查询数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public DatabaseGetData Queryable()
+        {
+            return new DatabaseGetData(_connectionConfig, database);
+        }
+
+        /// <summary>
+        /// Update data
+        /// 更新数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public DatabaseUpdateData Updateable()
+        {
+            return new DatabaseUpdateData(_connectionConfig, database);
+        }
+
+        /// <summary>
+        /// Delete data
+        /// 删除数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public DatabaseDeleteData Deleteable()
+        {
+            return new DatabaseDeleteData(_connectionConfig, database);
+        }
+
+        /// <summary>
+        /// Insert data
+        /// 插入数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public DatabaseInsertData Insertable()
+        {
+            return new DatabaseInsertData(_connectionConfig, database);
         }
     }
 
@@ -49,42 +87,85 @@ namespace DatabaseMaster2
         private ConnectionConfig _connectionConfig;
         private MongoDBDatabase database;
 
-        /// <summary>
-        /// update operate
-        /// 更新操作
-        /// </summary>
-        public MongoUpdateData Updateable;
-        /// <summary>
-        /// select operate
-        /// 查询操作
-        /// </summary>
-        public MongoGetData Queryable;
-        /// <summary>
-        /// delete operate
-        /// 删除操作
-        /// </summary>
-        public MongoDeleteData Deleteable;
-        /// <summary>
-        /// insert operate
-        /// 插入操作
-        /// </summary>
-        public MongoInsertData Insertable;
-        /// <summary>
-        /// file manage
-        /// 文件管理
-        /// </summary>
-        public MongoFileManage FileManage;
-
         public DatabaseMasterNOSQL(ConnectionConfig config)
         {
             _connectionConfig = config;
 
             database = new MongoDBDatabase(_connectionConfig.ConnectionString, true);
-            Updateable = new MongoUpdateData(_connectionConfig, database, config.DatabaseName);
-            Queryable = new MongoGetData(_connectionConfig, database, config.DatabaseName);
-            Deleteable = new MongoDeleteData(_connectionConfig, database, config.DatabaseName);
-            Insertable = new MongoInsertData(_connectionConfig, database, config.DatabaseName);
-            FileManage = new MongoFileManage(_connectionConfig, database, config.DatabaseName);
+        }
+
+        /// <summary>
+        /// Query data
+        /// 查询数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public MongoGetData Queryable(String databaseName)
+        {
+            return new MongoGetData(_connectionConfig, database, databaseName);
+        }
+
+        /// <summary>
+        /// Update data
+        /// 更新数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public MongoUpdateData Updateable(String databaseName)
+        {
+            return new MongoUpdateData(_connectionConfig, database, databaseName);
+        }
+
+        /// <summary>
+        /// Delete data
+        /// 删除数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public MongoDeleteData Deleteable(String databaseName)
+        {
+            return new MongoDeleteData(_connectionConfig, database, databaseName);
+        }
+
+        /// <summary>
+        /// Insert data
+        /// 插入数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public MongoInsertData Insertable(String databaseName)
+        {
+            return new MongoInsertData(_connectionConfig, database, databaseName);
+        }
+
+        /// <summary>
+        /// File manage
+        /// 文件管理
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public MongoFileManage FileManage(String databaseName)
+        {
+            return new MongoFileManage(_connectionConfig, database, databaseName);
+        }
+
+        /// <summary>
+        /// open connect
+        /// 长连接数据库
+        /// </summary>
+        public void Connect()
+        {
+            database.Open();
+        }
+
+
+        /// <summary>
+        /// close connect
+        /// 长关闭数据库
+        /// </summary>
+        public void Close()
+        {
+            database.Close();
         }
 
         /// <summary>

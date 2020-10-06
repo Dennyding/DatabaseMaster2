@@ -10,6 +10,7 @@ using System.Collections;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.IO;
+using MongoDB.Driver.GridFS;
 
 namespace DatabaseMaster2
 {
@@ -333,7 +334,8 @@ namespace DatabaseMaster2
         /// <param name="DatabaseName"></param>
         /// <param name="TableName"></param>
         /// <param name="filterDefinition"></param>
-        /// <param name="Timeout"></param>
+        /// <param name="SortName"></param>
+        /// <param name="sortMode"></param>
         /// <returns></returns>
         public DataSet GetDataSet(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
@@ -393,7 +395,6 @@ namespace DatabaseMaster2
         /// <param name="DatabaseName"></param>
         /// <param name="TableName"></param>
         /// <param name="filterDefinition"></param>
-        /// <param name="Timeout"></param>
         /// <returns></returns>
         public Int64 GetDataCount(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition)
         {
@@ -431,7 +432,6 @@ namespace DatabaseMaster2
         /// <param name="DatabaseName"></param>
         /// <param name="TableName"></param>
         /// <param name="filterDefinition"></param>
-        /// <param name="Timeout"></param>
         /// <returns></returns>
         public DataSet GetColumnDataSet(String DatabaseName, String TableName, List<String> IncludeColumnName, List<String> ExcludeColumnName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
@@ -503,7 +503,9 @@ namespace DatabaseMaster2
         /// <param name="DatabaseName"></param>
         /// <param name="TableName"></param>
         /// <param name="filterDefinition"></param>
-        /// <param name="Timeout"></param>
+        /// <param name="LimitNumber"></param>
+        /// <param name="SortName"></param>
+        /// <param name="sortMode"></param>
         /// <returns></returns>
         public DataSet GetTopRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
@@ -565,7 +567,10 @@ namespace DatabaseMaster2
         /// <param name="DatabaseName"></param>
         /// <param name="TableName"></param>
         /// <param name="filterDefinition"></param>
-        /// <param name="Timeout"></param>
+        /// <param name="StartNumber"></param>
+        /// <param name="LimitNumber"></param>
+        /// <param name="SortName"></param>
+        /// <param name="sortMode"></param>
         /// <returns></returns>
         public DataSet GetTopPageRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 StartNumber, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
@@ -775,7 +780,6 @@ namespace DatabaseMaster2
         /// </summary>
         /// <param name="DatabaseName"></param>
         /// <param name="TableName"></param>
-        /// <param name="filterDefinition"></param>
         /// <returns></returns>
         public Int32 DeleteData(String DatabaseName, String TableName)
         {
@@ -804,7 +808,6 @@ namespace DatabaseMaster2
         /// </summary>
         /// <param name="DatabaseName"></param>
         /// <param name="TableName"></param>
-        /// <param name="filterDefinition"></param>
         /// <returns></returns>
         public void DeleteTable(String DatabaseName, String TableName)
         {
@@ -829,8 +832,9 @@ namespace DatabaseMaster2
         /// </summary>
         /// <param name="DatabaseName"></param>
         /// <param name="FilePath"></param>
+        /// <param name="GridFSName"></param>
         /// <returns></returns>
-        public String UploadFile(String DatabaseName, String FilePath)
+        public String UploadFile(String DatabaseName, String FilePath, String GridFSName="")
         {
             if (conn == null)
             {
@@ -848,7 +852,12 @@ namespace DatabaseMaster2
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
-            MongoDB.Driver.GridFS.GridFSBucket bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+
+            MongoDB.Driver.GridFS.GridFSBucket bucket;
+            if (String.IsNullOrEmpty(GridFSName))
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+            else
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database, new GridFSBucketOptions{ BucketName = GridFSName });
             ObjectId id = bucket.UploadFromBytes(Path.GetFileName(FilePath), File.ReadAllBytes(FilePath));
 
             return id.ToString();
@@ -862,8 +871,8 @@ namespace DatabaseMaster2
         /// <param name="DatabaseName"></param>
         /// <param name="id"></param>
         /// <param name="FilePath"></param>
-        /// <returns></returns>
-        public void DownloadFile(String DatabaseName, String id, String FilePath)
+        /// <param name="GridFSName"></param>
+        public void DownloadFile(String DatabaseName, String id, String FilePath, String GridFSName = "")
         {
             if (conn == null)
             {
@@ -876,7 +885,11 @@ namespace DatabaseMaster2
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
-            MongoDB.Driver.GridFS.GridFSBucket bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+            MongoDB.Driver.GridFS.GridFSBucket bucket;
+            if (String.IsNullOrEmpty(GridFSName))
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+            else
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database, new GridFSBucketOptions { BucketName = GridFSName });
             Byte[] s = bucket.DownloadAsBytes(new ObjectId(id));
 
             File.WriteAllBytes(FilePath, s);
@@ -890,9 +903,8 @@ namespace DatabaseMaster2
         /// </summary>
         /// <param name="DatabaseName"></param>
         /// <param name="id"></param>
-        /// <param name="FilePath"></param>
-        /// <returns></returns>
-        public void DeleteFile(String DatabaseName, String id)
+        /// <param name="GridFSName"></param>
+        public void DeleteFile(String DatabaseName, String id, String GridFSName = "")
         {
             if (conn == null)
             {
@@ -905,8 +917,73 @@ namespace DatabaseMaster2
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
-            MongoDB.Driver.GridFS.GridFSBucket bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+            MongoDB.Driver.GridFS.GridFSBucket bucket;
+            if (String.IsNullOrEmpty(GridFSName))
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+            else
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database, new GridFSBucketOptions { BucketName = GridFSName });
             bucket.Delete(new ObjectId(id));
+
+            return;
+
+        }
+
+
+        /// <summary>
+        ///  改名文件
+        /// </summary>
+        /// <param name="DatabaseName"></param>
+        /// <param name="id"></param>
+        /// <param name="Filename"></param>
+        /// <param name="GridFSName"></param>
+        public void ReNameFile(String DatabaseName, String id, String Filename, String GridFSName = "")
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName);
+            MongoDB.Driver.GridFS.GridFSBucket bucket;
+            if (String.IsNullOrEmpty(GridFSName))
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+            else
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database, new GridFSBucketOptions { BucketName = GridFSName });
+            bucket.Rename(new ObjectId(id), Filename);
+
+            return;
+
+        }
+
+        /// <summary>
+        /// 删除文件库
+        /// </summary>
+        /// <param name="DatabaseName"></param>
+        /// <param name="GridFSName"></param>
+        public void DeleteGridFS(String DatabaseName, String GridFSName = "")
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName);
+            MongoDB.Driver.GridFS.GridFSBucket bucket;
+            if (String.IsNullOrEmpty(GridFSName))
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database);
+            else
+                bucket = new MongoDB.Driver.GridFS.GridFSBucket(database, new GridFSBucketOptions { BucketName = GridFSName });
+            bucket.Drop();
 
             return;
 

@@ -486,7 +486,7 @@ namespace DatabaseMaster2
                 MySqlParameter parameter = new MySqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
-                    MySqlDbType = ParameterOut[number].MySqlDbType,
+                    MySqlDbType = (MySqlDbType)ParameterOut[number].MySqlDbType,
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);
@@ -551,7 +551,7 @@ namespace DatabaseMaster2
                 MySqlParameter parameter = new MySqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
-                    MySqlDbType = ParameterOut[number].MySqlDbType,
+                    MySqlDbType = (MySqlDbType)ParameterOut[number].MySqlDbType,
                     Direction = ParameterDirection.ReturnValue
                 };
                 cmd.Parameters.Add(parameter);

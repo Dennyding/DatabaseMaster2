@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace DatabaseMaster2
 {
+    /// <summary>
+    /// SQL关系数据库
+    /// </summary>
     public class DatabaseMaster
     {
         private ConnectionConfig _connectionConfig;
@@ -82,16 +85,20 @@ namespace DatabaseMaster2
         }
     }
 
-    public class DatabaseMasterNOSQL
+    /// <summary>
+    /// MongoDB数据库
+    /// </summary>
+    public class DatabaseMasterMongoDB
     {
         private ConnectionConfig _connectionConfig;
         private MongoDBDatabase database;
 
-        public DatabaseMasterNOSQL(ConnectionConfig config)
+        public DatabaseMasterMongoDB(ConnectionConfig config)
         {
             _connectionConfig = config;
 
             database = new MongoDBDatabase(_connectionConfig.ConnectionString, true);
+
         }
 
         /// <summary>
@@ -210,5 +217,66 @@ namespace DatabaseMaster2
             database.CloseTransaction();
         }
 
+    }
+
+    /// <summary>
+    /// Redis数据库
+    /// </summary>
+    public class DatabaseMasterRedis
+    {
+        private ConnectionConfig _connectionConfig;
+        private RedisDBDatabase database;
+
+        public DatabaseMasterRedis(ConnectionConfig config)
+        {
+            _connectionConfig = config;
+
+            database = new RedisDBDatabase(_connectionConfig.ConnectionString, true);
+
+        }
+
+        /// <summary>
+        /// Query data
+        /// 查询数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public RedisGetData Readable(String databaseName)
+        {
+            return new RedisGetData(_connectionConfig, database);
+        }
+
+        /// <summary>
+        /// Query data
+        /// 查询数据
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public RedisSetData Writeable(String databaseName)
+        {
+            return new RedisSetData(_connectionConfig, database);
+        }
+
+
+        /// <summary>
+        /// open connect
+        /// 长连接数据库
+        /// </summary>
+        public void Connect()
+        {
+            database.Open();
+        }
+
+
+        /// <summary>
+        /// close connect
+        /// 长关闭数据库
+        /// </summary>
+        public void Close()
+        {
+            database.Close();
+        }
+
+    
     }
 }

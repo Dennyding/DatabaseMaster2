@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using  DatabaseMaster2;
-using DatabaseType = DatabaseMaster2.DatabaseType;
 
 namespace DatabaseTest
 {
@@ -47,7 +46,7 @@ namespace DatabaseTest
                 //data.Deleteable().Data("Table", "id", 1);
                 //data.Close();
 
-                DatabaseMasterNOSQL mongodb = new DatabaseMasterNOSQL(new ConnectionConfig()
+                DatabaseMasterMongoDB mongodb = new DatabaseMasterMongoDB(new ConnectionConfig()
                 {
                     ConnectionString = DatabaseConfigXml.GetDbConfigXml("DatabaseConfig.xml", "MongoDB",
                         "ConnectString", StringEncrypt.EncryptType.None),
@@ -64,6 +63,11 @@ namespace DatabaseTest
                 //mongodb.Updateable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 }, "id", 1);
                 //mongodb.Deleteable("DurabilityTest").Data("Table", "id", 1);
 
+               //String id= mongodb.FileManage("DurabilityTest").UploadFile("D:\\Downloads\\011002000411-31504817.pdf", "EXCEL");
+               //mongodb.FileManage("DurabilityTest").ReNameFile(id, "dingchen.pdf", "EXCEL");
+               //mongodb.FileManage("DurabilityTest").DownloadFile(id, "D:\\Downloads\\dingchen.pdf", "EXCEL");
+               //mongodb.FileManage("DurabilityTest").DeleteFile(id,"EXCEL");
+               //mongodb.FileManage("DurabilityTest").DeleteGridFS("EXCEL");
             }
             catch (Exception e)
             {

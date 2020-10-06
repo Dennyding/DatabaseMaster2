@@ -484,7 +484,7 @@ namespace DatabaseMaster2
                 NpgsqlParameter parameter = new NpgsqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
-                    NpgsqlDbType = ParameterOut[number].NpgsqlDbType,
+                    NpgsqlDbType = (NpgsqlDbType)ParameterOut[number].NpgsqlDbType,
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);
@@ -553,7 +553,7 @@ namespace DatabaseMaster2
                 NpgsqlParameter parameter = new NpgsqlParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
-                    NpgsqlDbType = ParameterOut[number].NpgsqlDbType,
+                    NpgsqlDbType = (NpgsqlDbType)ParameterOut[number].NpgsqlDbType,
                     Direction = ParameterDirection.ReturnValue
                 };
                 cmd.Parameters.Add(parameter);

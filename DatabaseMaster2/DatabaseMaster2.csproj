@@ -22,7 +22,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>3</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -117,6 +117,7 @@
     <Compile Include="ConfigureSetting.cs" />
     <Compile Include="DatabaseFactory\DatabaseInterface.cs" />
     <Compile Include="DatabaseFactory\DBFactory.cs" />
+    <Compile Include="DatabaseFactory\RedisDBDatabase.cs" />
     <Compile Include="DatabaseFactory\MongoDBDatabase.cs" />
     <Compile Include="DatabaseFactory\MYSQLDatabase.cs" />
     <Compile Include="DatabaseFactory\OleDBDatabase.cs" />
@@ -136,6 +137,8 @@
     <Compile Include="DatabaseLayer\MongoDB\MongoDeleteData.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoFileManage.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoDBOP.cs" />
+    <Compile Include="DatabaseLayer\Redis\RedisSetData.cs" />
+    <Compile Include="DatabaseLayer\Redis\RedisGetData.cs" />
     <Compile Include="DatabaseLayer\UpdateNewData.cs" />
     <Compile Include="EncyptClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

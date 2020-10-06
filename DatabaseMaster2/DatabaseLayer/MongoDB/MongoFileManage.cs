@@ -11,9 +11,9 @@ namespace DatabaseMaster2
 {
     public class MongoFileManage
     {
-        private ConnectionConfig _connectionConfig;
-        private MongoDBDatabase _database;
-        private string _databasename;
+        private  ConnectionConfig _connectionConfig;
+        private  MongoDBDatabase _database;
+        private  string _databasename;
 
         public MongoFileManage(ConnectionConfig config, MongoDBDatabase database, String DatabaseName)
         {
@@ -27,8 +27,9 @@ namespace DatabaseMaster2
         /// 上传文件
         /// </summary>
         /// <param name="FilePath"></param>
+        /// <param name="GridFSName"></param>
         /// <returns></returns>
-        public String UploadFile(String FilePath)
+        public String UploadFile(String FilePath, String GridFSName = "")
         {
             if (System.IO.File.Exists(FilePath) == false)
                 throw new Exception("file path not found");
@@ -38,7 +39,7 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            String s = _database.UploadFile(_databasename, FilePath);
+            String s = _database.UploadFile(_databasename, FilePath, GridFSName);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
@@ -51,7 +52,8 @@ namespace DatabaseMaster2
         /// </summary>
         /// <param name="ID"></param>
         /// <param name="FilePath"></param>
-        public void DownloadFile(String ID, String FilePath)
+        /// <param name="GridFSName"></param>
+        public void DownloadFile(String ID, String FilePath, String GridFSName = "")
         {
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
@@ -59,7 +61,7 @@ namespace DatabaseMaster2
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
 
-            _database.DownloadFile(_databasename, ID, FilePath);
+            _database.DownloadFile(_databasename, ID, FilePath, GridFSName);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
@@ -71,14 +73,55 @@ namespace DatabaseMaster2
         /// 删除文件
         /// </summary>
         /// <param name="ID"></param>
-        public void DeleteFile(String ID)
+        /// <param name="GridFSName"></param>
+        public void DeleteFile(String ID, String GridFSName = "")
         {
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            _database.DeleteFile(_databasename, ID);
+            _database.DeleteFile(_databasename, ID, GridFSName);
+
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            return;
+        }
+
+        /// <summary>
+        /// delete file
+        /// 改名文件
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="FileName"></param>
+        /// <param name="GridFSName"></param>
+        public void ReNameFile(String ID, String FileName, String GridFSName = "")
+        {
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            _database.ReNameFile(_databasename, ID, FileName, GridFSName);
+
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            return;
+        }
+
+        /// <summary>
+        /// delete GridFS
+        /// 删除文件库
+        /// </summary>
+        /// <param name="GridFSName"></param>
+        public void DeleteGridFS(String GridFSName = "")
+        {
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            _database.DeleteGridFS(_databasename, GridFSName);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 

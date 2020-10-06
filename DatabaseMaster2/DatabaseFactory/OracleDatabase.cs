@@ -479,7 +479,7 @@ namespace DatabaseMaster2
                 OracleParameter parameter = new OracleParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
-                    OracleDbType = ParameterOut[number].OracleDbType,
+                    OracleDbType = (OracleDbType)ParameterOut[number].OracleDbType,
                     Direction = ParameterDirection.Output
                 };
                 cmd.Parameters.Add(parameter);
@@ -547,7 +547,7 @@ namespace DatabaseMaster2
                 OracleParameter parameter = new OracleParameter
                 {
                     ParameterName = ParameterOut[number].ParameterName,
-                    OracleDbType = ParameterOut[number].OracleDbType,
+                    OracleDbType = (OracleDbType)ParameterOut[number].OracleDbType,
                     Direction = ParameterDirection.ReturnValue
                 };
                 cmd.Parameters.Add(parameter);

@@ -51,3 +51,15 @@ This is the second version for DatabaseMaster. If your want to join, please cont
                 mongodb.Insertable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 });
                 mongodb.Updateable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 }, "id", 1);
                 mongodb.Deleteable("DurabilityTest").Data("Table", "id", 1);
+
+                DatabaseMasterRedis redis = new DatabaseMasterRedis(new ConnectionConfig()
+                {
+                    ConnectionString = DatabaseConfigXml.GetDbConfigXml("DatabaseConfig.xml", "Redis",
+                    "ConnectString", StringEncrypt.EncryptType.None),
+                    IsAutoCloseConnection = true
+
+                });
+
+                redis.Writeable().Data("Test", "12345");
+                redis.Readable().Data<Int32>("Test");
+                redis.Writeable().Delete(new string[]{"Test"});

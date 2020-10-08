@@ -31,8 +31,8 @@ namespace DatabaseTest
                 });
 
                 //data.Connect();
-                //DataTable dt1 = data.Queryable().Data("T1111").ToDataTable();
-                //ParameterClass[] input=new ParameterClass[2];
+                //DataTable dt = data.Queryable().Data("T1111").ToDataTable();
+                //ParameterClass[] input = new ParameterClass[2];
                 //input[0].ParameterName = "@UserName";
                 //input[0].Value = "";
                 //input[1].ParameterName = "@Password";
@@ -40,7 +40,7 @@ namespace DatabaseTest
                 //ParameterOutClass[] output = new ParameterOutClass[1];
                 //output[0].ParameterName = "@IsVaild";
                 //output[0].SqlDbType = SqlDbType.Int;
-                //data.Queryable().Procedure("CheckUserLoginVaild", input,output);
+                //data.Queryable().Procedure("CheckUserLoginVaild", input, output);
                 //data.Insertable().Data("Table", new string[] { "C1" }, new object[] { 1 });
                 //data.Updateable().Data("Table", new string[] { "C1" }, new object[] { 1 }, "id", 1);
                 //data.Deleteable().Data("Table", "id", 1);
@@ -56,17 +56,17 @@ namespace DatabaseTest
 
                 //mongodb.Connect();
                 //DataTable dt1 = mongodb.Queryable("DurabilityTest").Data("Data2").ToDataTable();
-                //DataTable dt2 = mongodb.Queryable("DurabilityTest").Data("Data1", "VOLT电压", 38,CommandComparison.GreaterOrEquals).ToDataTable();
+                //DataTable dt2 = mongodb.Queryable("DurabilityTest").Data("Data1", "VOLT电压", 38, CommandComparison.GreaterOrEquals).ToDataTable();
                 //mongodb.Close();
                 //mongodb.Queryable("DurabilityTest").Data("Table").ToDataTable();
                 //mongodb.Insertable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 });
                 //mongodb.Updateable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 }, "id", 1);
                 //mongodb.Deleteable("DurabilityTest").Data("Table", "id", 1);
 
-                //String id= mongodb.FileManage("DurabilityTest").UploadFile("D:\\Downloads\\011002000411-31504817.pdf", "EXCEL");
+                //String id = mongodb.FileManage("DurabilityTest").UploadFile("D:\\Downloads\\011002000411-31504817.pdf", "EXCEL");
                 //mongodb.FileManage("DurabilityTest").ReNameFile(id, "dingchen.pdf", "EXCEL");
                 //mongodb.FileManage("DurabilityTest").DownloadFile(id, "D:\\Downloads\\dingchen.pdf", "EXCEL");
-                //mongodb.FileManage("DurabilityTest").DeleteFile(id,"EXCEL");
+                //mongodb.FileManage("DurabilityTest").DeleteFile(id, "EXCEL");
                 //mongodb.FileManage("DurabilityTest").DeleteGridFS("EXCEL");
 
                 DatabaseMasterRedis redis = new DatabaseMasterRedis(new ConnectionConfig()
@@ -77,9 +77,9 @@ namespace DatabaseTest
 
                 });
 
-                redis.Writeable().Data("Test", "12345");
-                redis.Readable().Data<Int32>("Test");
-                redis.Writeable().Delete(new string[]{"Test"});
+                //redis.Writeable().Data("Test", "12345");
+                //redis.Readable().Data<Int32>("Test");
+                //redis.Writeable().Delete(new string[]{"Test"});
             }
             catch (Exception e)
             {

@@ -63,11 +63,23 @@ namespace DatabaseTest
                 //mongodb.Updateable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 }, "id", 1);
                 //mongodb.Deleteable("DurabilityTest").Data("Table", "id", 1);
 
-               //String id= mongodb.FileManage("DurabilityTest").UploadFile("D:\\Downloads\\011002000411-31504817.pdf", "EXCEL");
-               //mongodb.FileManage("DurabilityTest").ReNameFile(id, "dingchen.pdf", "EXCEL");
-               //mongodb.FileManage("DurabilityTest").DownloadFile(id, "D:\\Downloads\\dingchen.pdf", "EXCEL");
-               //mongodb.FileManage("DurabilityTest").DeleteFile(id,"EXCEL");
-               //mongodb.FileManage("DurabilityTest").DeleteGridFS("EXCEL");
+                //String id= mongodb.FileManage("DurabilityTest").UploadFile("D:\\Downloads\\011002000411-31504817.pdf", "EXCEL");
+                //mongodb.FileManage("DurabilityTest").ReNameFile(id, "dingchen.pdf", "EXCEL");
+                //mongodb.FileManage("DurabilityTest").DownloadFile(id, "D:\\Downloads\\dingchen.pdf", "EXCEL");
+                //mongodb.FileManage("DurabilityTest").DeleteFile(id,"EXCEL");
+                //mongodb.FileManage("DurabilityTest").DeleteGridFS("EXCEL");
+
+                DatabaseMasterRedis redis = new DatabaseMasterRedis(new ConnectionConfig()
+                {
+                    ConnectionString = DatabaseConfigXml.GetDbConfigXml("DatabaseConfig.xml", "Redis",
+        "ConnectString", StringEncrypt.EncryptType.None),
+                    IsAutoCloseConnection = true
+
+                });
+
+                redis.Writeable().Data("Test", "12345");
+                redis.Readable().Data<Int32>("Test");
+                redis.Writeable().Delete(new string[]{"Test"});
             }
             catch (Exception e)
             {

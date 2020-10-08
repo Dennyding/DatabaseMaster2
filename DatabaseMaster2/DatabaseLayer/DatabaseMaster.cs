@@ -239,9 +239,8 @@ namespace DatabaseMaster2
         /// Query data
         /// 查询数据
         /// </summary>
-        /// <param name="databaseName">database-name 数据库名称</param>
         /// <returns></returns>
-        public RedisGetData Readable(String databaseName)
+        public RedisGetData Readable()
         {
             return new RedisGetData(_connectionConfig, database);
         }
@@ -250,9 +249,8 @@ namespace DatabaseMaster2
         /// Query data
         /// 查询数据
         /// </summary>
-        /// <param name="databaseName">database-name 数据库名称</param>
         /// <returns></returns>
-        public RedisSetData Writeable(String databaseName)
+        public RedisSetData Writeable()
         {
             return new RedisSetData(_connectionConfig, database);
         }

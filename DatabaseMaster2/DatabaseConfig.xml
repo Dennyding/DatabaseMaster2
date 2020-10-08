@@ -6,5 +6,6 @@
   <Oracle ConnectString="server=135.251.245.8;Data Source=Test;uid=HR;pwd=hr;" />
   <OleDB ConnectString="Data Source=135.251.245.8;database=Test;uid=sa;pwd=11;" />
   <SQLite ConnectString="Data Source=database.db;Version=3;" />
-  <MongoDB ConnectString="mongodb://Test:ioedu#2345@127.0.0.1:27000?authSource=DurabilityTest" />
+  <MongoDB ConnectString="mongodb://Test:2345@127.0.0.1:27000?authSource=DurabilityTest" />
+  <Redis ConnectString="127.0.0.1:6379,defaultDatabase=1" />
 </DatabaseModule>

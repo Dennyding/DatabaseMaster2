@@ -85,7 +85,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String OrderByName = "",
+        public IHashTable Data(String TableName, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
 
@@ -94,13 +94,13 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetDataSet(_databasename, TableName, new BsonDocument(), OrderByName,
+            List<Hashtable> hr = _database.GetDataSet(_databasename, TableName, new BsonDocument(), OrderByName,
                 sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -115,7 +115,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String ColumnName, Object Value,
+        public IHashTable Data(String TableName, String ColumnName, Object Value,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //数据库连接
@@ -124,12 +124,12 @@ namespace DatabaseMaster2
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
 
-            DataSet ds = _database.GetDataSet(_databasename, TableName,
+            List<Hashtable> hr = _database.GetDataSet(_databasename, TableName,
                 MongoDBOP.GetFilterOP(ColumnName, Value, CommandComparison.Equals), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -146,7 +146,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String ColumnName, Object Value,
+        public IHashTable Data(String TableName, String ColumnName, Object Value,
             CommandComparison Comparison, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
 
@@ -155,12 +155,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetDataSet(_databasename, TableName,
+            List<Hashtable> hr = _database.GetDataSet(_databasename, TableName,
                 MongoDBOP.GetFilterOP(ColumnName, Value, Comparison), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable { table = ds.Tables[0] };
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -175,7 +175,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String[] ColumnName, Object[] Value,
+        public IHashTable Data(String TableName, String[] ColumnName, Object[] Value,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
 
@@ -190,12 +190,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetDataSet(_databasename, TableName,
+            List<Hashtable> hr = _database.GetDataSet(_databasename, TableName,
                 MongoDBOP.GetWhere(ColumnName, Value), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable { table = ds.Tables[0] };
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -213,7 +213,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String[] ColumnName, CommandComparison[] Comparison,
+        public IHashTable Data(String TableName, String[] ColumnName, CommandComparison[] Comparison,
             Object[] Value, WhereRelation[] relation, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (ColumnName.Length != Value.Length && ColumnName.Length != Comparison.Length &&
@@ -227,12 +227,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetDataSet(_databasename, TableName,
+            List<Hashtable> hr = _database.GetDataSet(_databasename, TableName,
                 MongoDBOP.GetWhere(ColumnName, Value, Comparison, relation), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable { table = ds.Tables[0] };
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -518,7 +518,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, Int32 RecordNumber, String OrderByName = "",
+        public IHashTable Data(String TableName, Int32 RecordNumber, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
             //数据库连接
@@ -527,12 +527,12 @@ namespace DatabaseMaster2
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
 
-            DataSet ds = _database.GetTopRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopRecordsData(_databasename, TableName,
                 new BsonDocument(), RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -547,7 +547,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String ColumnName, Object Value, Int32 RecordNumber,
+        public IHashTable Data(String TableName, String ColumnName, Object Value, Int32 RecordNumber,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //数据库连接
@@ -556,12 +556,12 @@ namespace DatabaseMaster2
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
 
-            DataSet ds = _database.GetTopRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopRecordsData(_databasename, TableName,
                 MongoDBOP.GetFilterOP(ColumnName, Value, CommandComparison.Equals), RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -579,7 +579,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String ColumnName, CommandComparison Comparison,
+        public IHashTable Data(String TableName, String ColumnName, CommandComparison Comparison,
             Object Value, Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
 
@@ -588,12 +588,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetTopRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopRecordsData(_databasename, TableName,
                 MongoDBOP.GetFilterOP(ColumnName, Value, Comparison), RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -609,7 +609,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String[] ColumnName, Object[] Value,
+        public IHashTable Data(String TableName, String[] ColumnName, Object[] Value,
             Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (ColumnName.Length != Value.Length)
@@ -622,12 +622,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetTopRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopRecordsData(_databasename, TableName,
                 MongoDBOP.GetWhere(ColumnName, Value), RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -646,7 +646,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String[] ColumnName, CommandComparison[] Comparison,
+        public IHashTable Data(String TableName, String[] ColumnName, CommandComparison[] Comparison,
             Object[] Value, WhereRelation[] relation, Int32 RecordNumber, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
@@ -661,12 +661,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetTopRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopRecordsData(_databasename, TableName,
                 MongoDBOP.GetWhere(ColumnName, Value, Comparison, relation), RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -683,7 +683,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, Int32 StartNumber, Int32 RecordNumber,
+        public IHashTable Data(String TableName, Int32 StartNumber, Int32 RecordNumber,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //数据库连接
@@ -692,12 +692,12 @@ namespace DatabaseMaster2
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
 
-            DataSet ds = _database.GetTopPageRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopPageRecordsData(_databasename, TableName,
                 new BsonDocument(), StartNumber, RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -713,7 +713,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String ColumnName, Object Value,
+        public IHashTable Data(String TableName, String ColumnName, Object Value,
             Int32 StartNumber, Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             //数据库连接
@@ -722,13 +722,13 @@ namespace DatabaseMaster2
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
 
-            DataSet ds = _database.GetTopPageRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopPageRecordsData(_databasename, TableName,
                 MongoDBOP.GetFilterOP(ColumnName, Value, CommandComparison.Equals), StartNumber, RecordNumber, OrderByName,
                 sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -746,7 +746,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String ColumnName, CommandComparison Comparison,
+        public IHashTable Data(String TableName, String ColumnName, CommandComparison Comparison,
             Object Value, Int32 StartNumber, Int32 RecordNumber, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
@@ -756,12 +756,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetTopPageRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopPageRecordsData(_databasename, TableName,
                 MongoDBOP.GetFilterOP(ColumnName, Value, Comparison), StartNumber, RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -778,7 +778,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String[] ColumnName, Object[] Value,
+        public IHashTable Data(String TableName, String[] ColumnName, Object[] Value,
             Int32 StartNumber, Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (ColumnName.Length != Value.Length)
@@ -791,12 +791,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetTopPageRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopPageRecordsData(_databasename, TableName,
                 MongoDBOP.GetWhere(ColumnName, Value), StartNumber, RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -816,7 +816,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String[] ColumnName,
+        public IHashTable Data(String TableName, String[] ColumnName,
             CommandComparison[] Comparison, Object[] Value, WhereRelation[] relation, Int32 StartNumber,
             Int32 RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
@@ -831,12 +831,12 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetTopPageRecordsData(_databasename, TableName,
+            List<Hashtable> hr = _database.GetTopPageRecordsData(_databasename, TableName,
                 MongoDBOP.GetWhere(ColumnName, Value, Comparison, relation), StartNumber, RecordNumber, OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -850,7 +850,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, List<String> IncludeColumnName,
+        public IHashTable Data(String TableName, List<String> IncludeColumnName,
             List<String> ExcludeColumnName, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
 
@@ -859,14 +859,14 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
+            List<Hashtable> hr = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
                 ExcludeColumnName,
                 new BsonDocument(), OrderByName, sortMode);
 
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -882,7 +882,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, List<String> IncludeColumnName,
+        public IHashTable Data(String TableName, List<String> IncludeColumnName,
             List<String> ExcludeColumnName, String MatchColumn, Object MatchValue, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
@@ -891,13 +891,13 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
+            List<Hashtable> hr = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
                 ExcludeColumnName,
                 MongoDBOP.GetFilterOP(MatchColumn, MatchValue, CommandComparison.Equals), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -915,7 +915,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, List<String> IncludeColumnName,
+        public IHashTable Data(String TableName, List<String> IncludeColumnName,
             List<String> ExcludeColumnName, String MatchColumn, CommandComparison Comparison, Object MatchValue,
             String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
@@ -925,13 +925,13 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
+            List<Hashtable> hr = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
                 ExcludeColumnName,
                 MongoDBOP.GetFilterOP(MatchColumn, MatchValue, Comparison), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -947,7 +947,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, List<String> IncludeColumnName,
+        public IHashTable Data(String TableName, List<String> IncludeColumnName,
             List<String> ExcludeColumnName, String[] MatchColumn, Object[] MatchValue, String OrderByName = "",
             SortMode sortMode = SortMode.Ascending)
         {
@@ -961,13 +961,13 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
+            List<Hashtable> hr = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
                 ExcludeColumnName,
                 MongoDBOP.GetWhere(MatchColumn, MatchValue), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 
@@ -986,7 +986,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, List<String> IncludeColumnName,
+        public IHashTable Data(String TableName, List<String> IncludeColumnName,
             List<String> ExcludeColumnName, String[] MatchColumn, CommandComparison[] Comparison, Object[] MatchValue,
             WhereRelation[] relation, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
         {
@@ -1001,13 +1001,13 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            DataSet ds = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
+            List<Hashtable> hr = _database.GetColumnDataSet(_databasename, TableName, IncludeColumnName,
                 ExcludeColumnName,
                 MongoDBOP.GetWhere(MatchColumn, MatchValue, Comparison, relation), OrderByName, sortMode);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            IHashTable DT = new IHashTable(hr);
             return DT;
         }
 

@@ -131,6 +131,7 @@
     <Compile Include="DatabaseLayer\DeleteData.cs" />
     <Compile Include="DatabaseLayer\IDataTable.cs" />
     <Compile Include="DatabaseLayer\InsertNewData.cs" />
+    <Compile Include="DatabaseLayer\MongoDB\IHashTable.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoDBManage.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoInsertData.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoGetData.cs" />

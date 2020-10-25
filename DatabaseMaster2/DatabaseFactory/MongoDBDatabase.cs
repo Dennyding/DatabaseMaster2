@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.IO;
 using MongoDB.Driver.GridFS;
+using Newtonsoft.Json.Linq;
 
 namespace DatabaseMaster2
 {
@@ -441,7 +442,7 @@ namespace DatabaseMaster2
         /// <param name="SortName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public DataSet GetDataSet(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
+        public List<Hashtable> GetDataSet(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (conn == null)
             {
@@ -486,11 +487,11 @@ namespace DatabaseMaster2
                 hr.Add(ht);
             }
 
-            DataTable dt = HashTableToDataTable(hr);
-            DataSet ds = new DataSet();
-            ds.Tables.Add(dt);
+            //DataTable dt = HashTableToDataTable(hr);
+            //DataSet ds = new DataSet();
+            //ds.Tables.Add(dt);
 
-            return ds;
+            return hr;
 
         }
 
@@ -538,7 +539,7 @@ namespace DatabaseMaster2
         /// <param name="TableName"></param>
         /// <param name="filterDefinition"></param>
         /// <returns></returns>
-        public DataSet GetColumnDataSet(String DatabaseName, String TableName, List<String> IncludeColumnName, List<String> ExcludeColumnName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
+        public List<Hashtable> GetColumnDataSet(String DatabaseName, String TableName, List<String> IncludeColumnName, List<String> ExcludeColumnName, FilterDefinition<BsonDocument> filterDefinition, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (conn == null)
             {
@@ -594,11 +595,7 @@ namespace DatabaseMaster2
                 hr.Add(ht);
             }
 
-            DataTable dt = HashTableToDataTable(hr);
-            DataSet ds = new DataSet();
-            ds.Tables.Add(dt);
-
-            return ds;
+            return hr;
 
         }
 
@@ -612,7 +609,7 @@ namespace DatabaseMaster2
         /// <param name="SortName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public DataSet GetTopRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
+        public List<Hashtable> GetTopRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (conn == null)
             {
@@ -657,11 +654,7 @@ namespace DatabaseMaster2
                 hr.Add(ht);
             }
 
-            DataTable dt = HashTableToDataTable(hr);
-            DataSet ds = new DataSet();
-            ds.Tables.Add(dt);
-
-            return ds;
+            return hr;
 
         }
 
@@ -677,7 +670,7 @@ namespace DatabaseMaster2
         /// <param name="SortName"></param>
         /// <param name="sortMode"></param>
         /// <returns></returns>
-        public DataSet GetTopPageRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 StartNumber, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
+        public List<Hashtable> GetTopPageRecordsData(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition, Int32 StartNumber, Int32 LimitNumber, String SortName = "", SortMode sortMode = SortMode.Ascending)
         {
             if (conn == null)
             {
@@ -721,11 +714,7 @@ namespace DatabaseMaster2
                 hr.Add(ht);
             }
 
-            DataTable dt = HashTableToDataTable(hr);
-            DataSet ds = new DataSet();
-            ds.Tables.Add(dt);
-
-            return ds;
+            return hr;
 
         }
 

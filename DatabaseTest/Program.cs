@@ -54,6 +54,8 @@ namespace DatabaseTest
 
                 });
 
+                //List<Hashtable> hr = mongodb.Queryable("DurabilityTest").Data("Summary").ToListHashTable();
+
                 //mongodb.Connect();
                 //DataTable dt1 = mongodb.Queryable("DurabilityTest").Data("Data2").ToDataTable();
                 //DataTable dt2 = mongodb.Queryable("DurabilityTest").Data("Data1", "VOLT电压", 38, CommandComparison.GreaterOrEquals).ToDataTable();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Collections;
+using System.Windows.Markup;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -22,6 +23,9 @@ namespace DatabaseMaster2
         public static FilterDefinition<BsonDocument> GetFilterOP(String ColumnName, Object Value,
             CommandComparison comparison)
         {
+            Object[] v;
+            String[] s;
+
             switch ((int)comparison)
             {
                 case 1:
@@ -55,12 +59,79 @@ namespace DatabaseMaster2
             switch (type)
             {
                 case "System.DateTime":
-                    return Convert.ToString(Value);
+                    return Convert.ToDateTime(Value);
                 case "System.String":
                     return Convert.ToString(Value);
                 default:
                     return Value;
             }
+        }
+
+        /// <summary>
+        /// 将HashTable转为Jason
+        /// </summary>
+        /// <param name="hr"></param>
+        /// <returns></returns>
+        public static string HashtableToJson(Hashtable hr)
+        {
+            string json = "{";
+            foreach (DictionaryEntry row in hr)
+            {
+                try
+                {
+                    string key = "\"" + row.Key + "\":";
+                    if (row.Value is Hashtable)
+                    {
+                        Hashtable t = (Hashtable)row.Value;
+                        if (t.Count > 0)
+                        {
+                            json += key + HashtableToJson(t) + ",";
+                        }
+                        else
+                        {
+                            json += key + "{},";
+                        }
+                    }
+                    else if (row.Value.ToString().StartsWith("[") && row.Value.ToString().EndsWith("]"))
+                    {
+                        string value = row.Value.ToString() + ",";
+                        json += key + value;
+                    }
+                    else
+                    {
+                        string value;
+                        if (row.Value.GetType().ToString().Equals("System.String"))
+                        {
+                            if (row.Value.ToString().StartsWith("ObjectId(") && row.Value.ToString().EndsWith(")"))
+                            {
+                                value = row.Value.ToString() + ",";
+                            }
+                            else
+                                value = "\"" + row.Value.ToString() + "\",";
+                        }
+                        else if (row.Value.GetType().ToString().Equals("System.DateTime"))
+                        {
+                            value = "ISODate(\"" +
+                                    BsonDateTime.Create(Convert.ToDateTime(Convert.ToDateTime(row.Value).ToString("yyyy-MM-dd HH:mm:ss"))) + "\"),";
+                        }
+                        else
+                        {
+                            value = row.Value.ToString() + ",";
+                        }
+
+                        json += key + value;
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            //  json = MyString.ClearEndChar(json);  
+
+
+            json = json.Remove(json.Length - 1) + "}";
+            return json;
         }
 
 
@@ -105,7 +176,7 @@ namespace DatabaseMaster2
                 FilterDefinition<BsonDocument> def = MongoDBOP.GetFilterOP(ColumnName[i], Value[i], comparison[i]);
 
 
-                if (relation[i] == WhereRelation.And)
+                if (relation[i] != WhereRelation.Or)
                     definition = definition & def;
                 else
                     definition = definition | def;
@@ -116,79 +187,7 @@ namespace DatabaseMaster2
             return definition;
         }
 
-        /// <summary>
-        /// 将HashTable转为Jason
-        /// </summary>
-        /// <param name="hr"></param>
-        /// <returns></returns>
-        public static string HashtableToJson(Hashtable hr)
-        {
-            string json = "{";
-            foreach (DictionaryEntry row in hr)
-            {
-                try
-                {
-                    string key = "\"" + row.Key + "\":";
-                    if (row.Value is Hashtable)
-                    {
-                        Hashtable t = (Hashtable)row.Value;
-                        if (t.Count > 0)
-                        {
-                            json += key + HashtableToJson(t) + ",";
-                        }
-                        else
-                        {
-                            json += key + "{},";
-                        }
-                    }
-                    else if (row.Value.ToString().StartsWith("[") && row.Value.ToString().EndsWith("]"))
-                    {
-                        string value = row.Value.ToString() + ",";
-                        json += key + value;
-                    }
-                    else
-                    {
-                        string value;
-                        if (row.Value.GetType().ToString().Equals("System.String"))
-                        {
-                            if (row.Value.ToString().StartsWith("ISODate(") && row.Value.ToString().EndsWith(")"))
-                                value = "ISODate(\"" +
-                                        BsonDateTime.Create(row.Value.ToString().Replace("ISODate(", "")
-                                            .Replace(")", "")) + "\"),";
-                            else if (row.Value.ToString().Equals("new Date()"))
-                            {
-                                value = row.Value.ToString() + ",";
-                            }
-                            else if (row.Value.ToString().StartsWith("ObjectId(") && row.Value.ToString().EndsWith(")"))
-                            {
-                                value = row.Value.ToString() + ",";
-                            }
-                            else
-                                value = "\"" + row.Value.ToString() + "\",";
-                        }
-                        else if (row.Value.GetType().ToString().Equals("System.DateTime"))
-                        {
-                            value = "\"" + row.Value.ToString() + "\",";
-                        }
-                        else
-                        {
-                            value = row.Value.ToString() + ",";
-                        }
 
-                        json += key + value;
-                    }
-                }
-                catch
-                {
-                }
-            }
-
-            //  json = MyString.ClearEndChar(json);  
-
-
-            json = json.Remove(json.Length - 1) + "}";
-            return json;
-        }
 
     }
 

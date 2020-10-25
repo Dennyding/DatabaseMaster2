@@ -7,6 +7,7 @@ using System.Data;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System.Collections;
+using System.Globalization;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using System.IO;
@@ -27,6 +28,7 @@ namespace DatabaseMaster2
         /// <returns></returns>
         private Hashtable Json2Hashtable(string json)
         {
+
             Regex r = new Regex(@"ObjectId\(\S+\)");
 
             MatchCollection match = r.Matches(json);
@@ -43,8 +45,13 @@ namespace DatabaseMaster2
 
             foreach (Match m1 in match)
             {
+            
                 String v = m1.Value.Replace("ISODate(\"", "").Replace("\")", "");
-                v = DateTime.Parse(v).ToString();
+                //v = DateTime.Parse(v).ToString();
+               v= DateTime.Parse(v, CultureInfo.InvariantCulture,
+                       DateTimeStyles.AssumeUniversal)
+                    .ToString("yyyy-MM-dd hh:mm:ss");
+
                 v = "\"" + v + "\"";
                 json = json.Replace(m1.Value, v);
 
@@ -260,6 +267,122 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// get all database name
+        /// </summary>
+        /// <returns></returns>
+        public List<String> GetCollectionName(String DatabaseName)
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName);
+            return database.ListCollectionNames().ToList();
+        }
+
+        /// <summary>
+        /// delete database
+        /// </summary>
+        /// <returns></returns>
+        public void DropDatabase(String DatabaseName)
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            conn.DropDatabase(DatabaseName);
+        }
+
+        /// <summary>
+        /// delete Collection
+        /// </summary>
+        /// <returns></returns>
+        public void DropCollection(String DatabaseName, String TableName)
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName); 
+            database.DropCollection(TableName);
+        }
+
+        /// <summary>
+        /// create Collection
+        /// </summary>
+        /// <returns></returns>
+        public void CreateCollection(String DatabaseName, String TableName)
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName);
+            database.CreateCollection(TableName);
+        }
+
+        /// <summary>
+        /// rename Collection
+        /// </summary>
+        /// <returns></returns>
+        public void RenameCollection(String DatabaseName, String OldTableName, String NewTableName)
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName);
+            database.RenameCollection(OldTableName, NewTableName);
+        }
+
+        /// <summary>
+        /// RunCommand
+        /// </summary>
+        /// <returns></returns>
+        public Hashtable RunCommand(String DatabaseName, String command)
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName);
+
+           return database.RunCommand<BsonDocument>(command).ToHashtable();
+        }
+
+
+        /// <summary>
         /// get first row and first colunm value from database
         /// </summary>
         /// <param name="DatabaseName"></param>
@@ -308,25 +431,6 @@ namespace DatabaseMaster2
             return ht[ColunmName];
         }
 
-        /// <summary>
-        /// Check database connect
-        /// </summary>
-        /// <returns></returns>
-        public object CheckConnect()
-        {
-
-            if (conn == null)
-            {
-                throw new Exception("Connection has not initialize.");
-            }
-
-            List<String> s = GetDatabaseName();
-
-            if (s.Count == 0)
-                return 0;
-            else
-                return s.Count;
-        }
 
         /// <summary>
         /// return a dataset from database
@@ -374,6 +478,7 @@ namespace DatabaseMaster2
                     sortMode == SortMode.Ascending ? builderSort.Ascending(SortName) : builderSort.Descending(SortName);
                 cursor = collection.Find(filter).Sort(sort).ToCursor();
             }
+
 
             foreach (var document in cursor.ToEnumerable())
             {
@@ -640,7 +745,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -667,7 +772,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -701,7 +806,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -727,7 +832,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -737,10 +842,7 @@ namespace DatabaseMaster2
             List<UpdateDefinition<BsonDocument>> s = new List<UpdateDefinition<BsonDocument>>();
             foreach (DictionaryEntry de in ht)
             {
-                if (de.Value.ToString().StartsWith("ISODate(") && de.Value.ToString().EndsWith(")"))
-                    s.Add(Builders<BsonDocument>.Update.Set(de.Key.ToString(), BsonDateTime.Create(Convert.ToDateTime(de.Value.ToString().Replace("ISODate(", "").Replace(")", "")))));
-                else
-                    s.Add(Builders<BsonDocument>.Update.Set(de.Key.ToString(), de.Value));
+                s.Add(Builders<BsonDocument>.Update.Set(de.Key.ToString(), de.Value));
             }
 
             var result1 = collection.UpdateMany(filterDefinition, Builders<BsonDocument>.Update.Combine(s.ToArray()));
@@ -764,7 +866,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -818,7 +920,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -843,7 +945,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             if (File.Exists(FilePath) == false)
@@ -881,7 +983,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -913,7 +1015,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -945,7 +1047,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);
@@ -974,7 +1076,7 @@ namespace DatabaseMaster2
 
             if (DatabaseName.Length == 0)
             {
-                throw new Exception("Database Name is not exist.");
+                throw new Exception("Database Name is invalid.");
             }
 
             IMongoDatabase database = conn.GetDatabase(DatabaseName);

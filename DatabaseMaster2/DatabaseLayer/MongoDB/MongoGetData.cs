@@ -75,6 +75,8 @@ namespace DatabaseMaster2
                 return ObjectId.GenerateNewId().ToString();
         }
 
+       
+
         /// <summary>
         /// get all data
         /// 得到表中所有数据

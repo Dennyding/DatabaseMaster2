@@ -58,9 +58,12 @@ namespace DatabaseTest
                 //DataTable dt1 = mongodb.Queryable("DurabilityTest").Data("Data2").ToDataTable();
                 //DataTable dt2 = mongodb.Queryable("DurabilityTest").Data("Data1", "VOLT电压", 38, CommandComparison.GreaterOrEquals).ToDataTable();
                 //mongodb.Close();
+                //mongodb.Queryable("DurabilityTest").Data("Summary", new string[] { "开始时间/TestStartTime" }, new CommandComparison[]{CommandComparison.GreaterOrEquals
+                //}, new object[] { Convert.ToDateTime("2020-10-25 10:06:00") }, new WhereRelation[] { WhereRelation.None }).ToDataTable();
+
                 //mongodb.Queryable("DurabilityTest").Data("Table").ToDataTable();
-                //mongodb.Insertable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 });
-                //mongodb.Updateable("DurabilityTest").Data("Table", new string[] { "C1" }, new object[] { 1 }, "id", 1);
+                //mongodb.Insertable("DurabilityTest").Data("Summary", new string[] { "开始时间/TestStartTime" }, new object[] { Convert.ToDateTime("2020-10-25 10:05:32") });
+                //mongodb.Updateable("DurabilityTest").Data("Summary", new string[] { "开始时间/TestStartTime" }, new object[] { Convert.ToDateTime("2020-10-25 10:06:00") },"_id",CommandComparison.Is,"5f94f387ed02f4ba4007e0c5");
                 //mongodb.Deleteable("DurabilityTest").Data("Table", "id", 1);
 
                 //String id = mongodb.FileManage("DurabilityTest").UploadFile("D:\\Downloads\\011002000411-31504817.pdf", "EXCEL");

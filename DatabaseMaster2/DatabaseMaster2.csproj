@@ -131,6 +131,7 @@
     <Compile Include="DatabaseLayer\DeleteData.cs" />
     <Compile Include="DatabaseLayer\IDataTable.cs" />
     <Compile Include="DatabaseLayer\InsertNewData.cs" />
+    <Compile Include="DatabaseLayer\MongoDB\MongoDBManage.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoInsertData.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoGetData.cs" />
     <Compile Include="DatabaseLayer\MongoDB\MongoUpdateData.cs" />
@@ -155,7 +156,7 @@
     <Content Include="Core\Compression\Snappy\lib\win\snappy64.dll" />
     <Content Include="Core\Compression\Zstandard\lib\win\libzstd.dll" />
     <Content Include="DatabaseConfig.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>

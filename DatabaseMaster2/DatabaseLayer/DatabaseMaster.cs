@@ -157,6 +157,18 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
+        /// DBManage
+        /// 数据库管理
+        /// </summary>
+        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <returns></returns>
+        public MongoDBManage DBManage()
+        {
+            return new MongoDBManage(_connectionConfig, database);
+        }
+
+
+        /// <summary>
         /// open connect
         /// 长连接数据库
         /// </summary>

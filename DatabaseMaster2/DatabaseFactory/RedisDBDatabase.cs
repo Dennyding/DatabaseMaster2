@@ -88,6 +88,7 @@ namespace DatabaseMaster2
             conn = null;
         }
 
+
         /// <summary>
         /// check conn is open
         /// </summary>

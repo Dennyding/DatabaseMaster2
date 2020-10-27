@@ -56,6 +56,11 @@ namespace DatabaseTest
 
                 //List<Hashtable> hr = mongodb.Queryable("DurabilityTest").Data("Summary").ToListHashTable();
 
+         
+                //mongodb.Queryable("DurabilityTest").TableLink("T1111", new string[] {"_id"},
+                //    new CommandComparison[] {CommandComparison.Is}, new object[] {"5f929ac3023a36f332afd822"},
+                //    new WhereRelation[] {WhereRelation.None}, new List<string> {"Serial样机编号", "Time时间"},
+                //    new List<string> { }, "Summary", "Serial样机编号", "Serial样机编号", "Summary").ToDataTable();
                 //mongodb.Connect();
                 //DataTable dt1 = mongodb.Queryable("DurabilityTest").Data("Data2").ToDataTable();
                 //DataTable dt2 = mongodb.Queryable("DurabilityTest").Data("Data1", "VOLT电压", 38, CommandComparison.GreaterOrEquals).ToDataTable();

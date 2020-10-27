@@ -718,6 +718,76 @@ namespace DatabaseMaster2
 
         }
 
+        /// <summary>
+        /// retrun Table Link
+        /// </summary>
+        /// <param name="DatabaseName"></param>
+        /// <param name="TableName"></param>
+        /// <param name="filterDefinition"></param>
+        /// <param name="IncludeColumnName"></param>
+        /// <param name="ExcludeColumnName"></param>
+        /// <param name="ForeignTable"></param>
+        /// <param name="LocalField"></param>
+        /// <param name="ForeignField"></param>
+        /// <param name="ForeignName"></param>
+        /// <returns></returns>
+        public List<Hashtable> TableLink(String DatabaseName, String TableName, FilterDefinition<BsonDocument> filterDefinition
+            ,List<String> IncludeColumnName, List<String> ExcludeColumnName, String ForeignTable, String LocalField, String ForeignField,String ForeignName)
+        {
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (DatabaseName.Length == 0)
+            {
+                throw new Exception("Database Name is not exist.");
+            }
+
+            IMongoDatabase database = conn.GetDatabase(DatabaseName);
+
+            if (database.ListCollectionNames().ToList().Contains(TableName) == false)
+            {
+                throw new Exception("Collection Name is not exist in MongoDB Database.");
+            }
+
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(TableName);
+
+            var filter = filterDefinition;
+
+            var fieldList = new List<ProjectionDefinition<BsonDocument>>();
+            for (int i = 0; i < IncludeColumnName.Count; i++)
+            {
+                fieldList.Add(Builders<BsonDocument>.Projection.Include(IncludeColumnName[i]));
+            }
+            for (int i = 0; i < ExcludeColumnName.Count; i++)
+            {
+                fieldList.Add(Builders<BsonDocument>.Projection.Exclude(ExcludeColumnName[i]));
+            }
+
+            var projection = Builders<BsonDocument>.Projection.Combine(fieldList);
+
+            List <Hashtable> hr = new List<Hashtable>();
+
+            IAsyncCursor<BsonDocument> cursor;
+
+            cursor = collection.Aggregate().Match(filterDefinition).Project(projection)
+                .Lookup(ForeignTable, LocalField, ForeignField, ForeignName).ToCursor();
+
+            foreach (var document in cursor.ToEnumerable())
+            {
+                Hashtable ht = Json2Hashtable(document.ToJson());
+                hr.Add(ht);
+            }
+
+            //DataTable dt = HashTableToDataTable(hr);
+            //DataSet ds = new DataSet();
+            //ds.Tables.Add(dt);
+
+            return hr;
+
+        }
+
 
         /// <summary>
         /// Insert new data

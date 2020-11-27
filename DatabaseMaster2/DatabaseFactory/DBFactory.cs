@@ -13,7 +13,8 @@ namespace DatabaseMaster2
         OleDB=4,
         SQLite=5,
         PostgreSQL=6,
-        Access = 7
+        Access = 7,
+        PinusDB=8
     }
 
     public class DBFactory
@@ -37,6 +38,8 @@ namespace DatabaseMaster2
                     return new PostgreSQL(ConnString, true);
                 case DatabaseType.Access:
                     return new OleDBDatabase(ConnString, true);
+                case DatabaseType.PinusDB:
+                    return new PinusDatabase(ConnString, true);
                 default:
                     return new SQLServerDatabase(ConnString, true);
             }

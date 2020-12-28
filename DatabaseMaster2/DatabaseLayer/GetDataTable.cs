@@ -814,7 +814,7 @@ namespace DatabaseMaster2
         /// <param name="OrderByName"></param>
         /// <param name="RecordNumber"></param>
         /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, int RecordNumber, String OrderByName= "", SortMode sortMode = SortMode.Ascending)
+        public IDataTable Data(string TableName, int RecordNumber, string ColumnName,String OrderByName= "", SortMode sortMode = SortMode.Ascending)
         {
             //sql生成
             var sql = new SelectDBCommandBuilder();

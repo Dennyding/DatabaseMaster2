@@ -212,6 +212,43 @@ namespace DatabaseMaster2
         /// 得到得到多个指定条件的表中所有数据
         /// </summary>
         /// <param name="TableName"></param>
+        /// <param name="ColumnName"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="Value"></param>
+        /// <param name="raRelation"></param>
+        /// <param name="OrderByName"></param>
+        /// <param name="sortMode"></param>
+        /// <returns></returns>
+        public IDataTable Data(string TableName, string[] ColumnName, CommandComparison[] Comparison,
+            object[] Value,WhereRelation[] raRelation, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
+        {
+            //sql生成
+            var sql = new SelectDBCommandBuilder();
+            sql.AddSelectTable(TableName);
+            sql.AddSelectALLColumn();
+
+            for (var i = 0; i < ColumnName.Length; i++)
+                sql.AddWhere(raRelation[i], ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
+            if (String.IsNullOrEmpty(OrderByName) == false)
+                sql.AddOrderBy(OrderByName, sortMode);
+
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            IDataTable DT = new IDataTable { table = ds.Tables[0] };
+            return DT;
+        }
+
+        /// <summary>
+        /// get data by filter
+        /// 得到得到多个指定条件的表中所有数据
+        /// </summary>
+        /// <param name="TableName"></param>
         /// <param name="GroupColumnName"></param>
         /// <param name="ColumnName"></param>
         /// <param name="Comparison"></param>
@@ -455,6 +492,44 @@ namespace DatabaseMaster2
                 return true;
         }
 
+        /// <summary>
+        /// check data exist
+        /// 检查表中是否存在指定内容
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <param name="ColumnName"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="Value"></param>
+        /// <param name="relation"></param>
+        /// <returns></returns>
+        public bool Exist(string TableName, string[] ColumnName, CommandComparison[] Comparison,
+            object[] Value,WhereRelation[] relation)
+        {
+            //sql生成
+            var sql = new SelectDBCommandBuilder();
+            sql.AddSelectTable(TableName);
+            sql.AddSelectALLColumn();
+
+            for (var i = 0; i < ColumnName.Length; i++)
+                sql.AddWhere(relation[i], ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
+
+
+            sql.SelectCount = true;
+
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            var count = Convert.ToInt64(_database.GetSpeciaRecordValue(sql.BuildCommand(),
+                _connectionConfig.WaitTimeout));
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            if (count == 0)
+                return false;
+            else
+                return true;
+        }
 
         /// <summary>
         /// execute procedure data exist
@@ -750,6 +825,41 @@ namespace DatabaseMaster2
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
+        /// <param name="KeyColumnName"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="KeyValue"></param>
+        /// <param name="relation"></param>
+        /// <param name="CountNumber"></param>
+        /// <returns></returns>
+        public object First(string TableName, string ColumnName, string[] KeyColumnName,
+            CommandComparison[] Comparison, object[] KeyValue,WhereRelation[] relation, bool CountNumber)
+        {
+            //sql生成
+            var sql = new SelectDBCommandBuilder();
+            sql.AddSelectTable(TableName);
+            sql.AddSelectColumn(ColumnName);
+            sql.SelectCount = true;
+
+            for (var i = 0; i < KeyColumnName.Length; i++)
+                sql.AddWhere(relation[i], KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
+
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            return result;
+        }
+
+        /// <summary>
+        /// get count data by filter
+        ///  得到指定条件的行计数数据
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <param name="ColumnName"></param>
         /// <param name="CountNumber"></param>
         /// <returns></returns>
         public object First(string TableName, string ColumnName, bool CountNumber)
@@ -986,6 +1096,41 @@ namespace DatabaseMaster2
             return DT;
         }
 
+        /// <summary>
+        /// get recordnumber data by filter
+        /// 得到指定数据的指定内容
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <param name="KeyColumnName"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="KeyValue"></param>
+        /// <param name="RecordNumber"></param>
+        /// <returns></returns>
+        public IDataTable Data(string TableName, string[] KeyColumnName, CommandComparison[] Comparison,
+            object[] KeyValue,WhereRelation[] relation, int RecordNumber)
+        {
+            //sql生成
+            var sql = new SelectDBCommandBuilder();
+            sql.AddSelectTable(TableName);
+            sql.AddSelectALLColumn();
+
+            sql.TopRecords = RecordNumber;
+
+            for (var i = 0; i < KeyColumnName.Length; i++)
+                sql.AddWhere(relation[i], KeyColumnName[i], (CommandComparison)Comparison[i], KeyValue[i]);
+
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            IDataTable DT = new IDataTable();
+            DT.table = dt;
+            return DT;
+        }
 
         /// <summary>
         /// get columns data by filter
@@ -1204,6 +1349,40 @@ namespace DatabaseMaster2
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
             IDataTable DT = new IDataTable {table = ds.Tables[0]};
+            return DT;
+        }
+
+        /// <summary>
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <param name="ColumnName"></param>
+        /// <param name="MatchColumn"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="MatchValue"></param>
+        /// <returns></returns>
+        public IDataTable ColumnData(string TableName, List<string> ColumnName, string[] MatchColumn,
+            CommandComparison[] Comparison, object[] MatchValue,WhereRelation[] relation)
+        {
+            //sql生成
+            var sql = new SelectDBCommandBuilder();
+            sql.AddSelectTable(TableName);
+            sql.AddSelectColumn(ColumnName);
+
+            for (var i = 0; i < MatchColumn.Length; i++)
+                sql.AddWhere(relation[i], MatchColumn[i], (CommandComparison)Comparison[i], MatchValue[i]);
+
+
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            IDataTable DT = new IDataTable { table = ds.Tables[0] };
             return DT;
         }
 

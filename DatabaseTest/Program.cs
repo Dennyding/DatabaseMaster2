@@ -21,21 +21,31 @@ namespace DatabaseTest
                 //    "server=135.251.245.8;Data Source=Test;uid=HR;pwd=hr;");
 
                 //DatabaseConfigXml.SetStringEncrypt();
-                //DatabaseMaster data = new DatabaseMaster(new ConnectionConfig()
-                //{
-                //    //ConnectionString = "server=135.251.245.8;Data Source=Test;uid=HR;pwd=hr;";
-                //    ConnectionString = DatabaseConfigXml.GetDbConfigXml("DatabaseConfig.xml", "SQLite", "ConnectString",
-                //        StringEncrypt.EncryptType.None),
-                //    DBType = DatabaseType.SQLite,
-                //    IsAutoCloseConnection = true
-                //});
+                //DatabaseMaster data = new DatabaseMaster(
+                //    new ConnectionConfig()
+                //    {
+                //        //ConnectionString = "server=135.251.245.8;Data Source=Test;uid=HR;pwd=hr;";
+                //        ConnectionString =
+                //            DatabaseConfigXml.GetDbConfigXml(
+                //                    "DatabaseConfig.xml",
+                //                    "SQLite",
+                //                    "ConnectString",
+                //                    StringEncrypt.EncryptType.None),
+                //        DBType = DatabaseType.SQLite.ToString(),
+                //        IsAutoCloseConnection = true
+                //    });
+                //data.Queryable("TestCase_List_Table")
+                //    .Columns()
+                //   .Where("Product_ID", 1)
+                //   .Where("TestCase_List_SequenceNo", 4)
+                //   .Data().ToDataTable();
                 //data.Updateable("TestCase_List_Table")
                 //    .Where("Product_ID", 1)
                 //    .Where("TestCase_List_SequenceNo", 4)
-                //    .Data(new String[] { "TestCase_List_PassFail" }, new Object[] {0 })
+                //    .Data(new String[] { "TestCase_List_PassFail" }, new Object[] { 0 })
                 //    .ExecuteCommand();
 
-               
+
 
                 DatabaseMasterMongoDB mongodb = new DatabaseMasterMongoDB(new ConnectionConfig()
                 {

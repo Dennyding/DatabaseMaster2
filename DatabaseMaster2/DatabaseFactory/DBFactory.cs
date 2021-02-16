@@ -19,26 +19,26 @@ namespace DatabaseMaster2
 
     public class DBFactory
     {
-        public static DatabaseInterface CreateDatabase(DatabaseType dbType,String ConnString)
+        public static DatabaseInterface CreateDatabase(String dbType,String ConnString)
         {
           
             switch (dbType)
             {
-                case DatabaseType.MSSQL:
+                case "MSSQL":
                     return new SQLServerDatabase(ConnString, true);
-                case DatabaseType.MYSQL:
+                case "MYSQL":
                     return new MYSQLDatabase(ConnString, true);
-                case DatabaseType.Oracle:
+                case "Oracle":
                     return new OracleDatabase(ConnString, true);
-                case DatabaseType.OleDB:
+                case "OleDB":
                     return new OleDBDatabase(ConnString, true);
-                case DatabaseType.SQLite:
+                case "SQLite":
                     return new SQLiteDatabase(ConnString, true);
-                case DatabaseType.PostgreSQL:
+                case "PostgreSQL":
                     return new PostgreSQL(ConnString, true);
-                case DatabaseType.Access:
+                case "Access":
                     return new OleDBDatabase(ConnString, true);
-                case DatabaseType.PinusDB:
+                case "PinusDB":
                     return new PinusDatabase(ConnString, true);
                 default:
                     return new SQLServerDatabase(ConnString, true);

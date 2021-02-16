@@ -100,10 +100,9 @@ namespace DatabaseMaster2
     public class ConnectionConfig
     {
         private String _connString;
-        private DatabaseType _dbType;
+        private String _dbType;
         private Boolean _isAutoclose=true;
         private Int32 _Timeout=30;
-        private String _DatabaseName;
 
         /// <summary>
         /// set connection string, your can use DatabaseConfigXml class to read from xml file
@@ -125,10 +124,17 @@ namespace DatabaseMaster2
         /// database type
         /// 数据库类型
         /// </summary>
-        public DatabaseType DBType
+        public String DBType
         {
-            get => _dbType;
-            set => _dbType = value;
+            get => _dbType; 
+            set 
+            {
+                DatabaseType result;
+                if (Enum.TryParse<DatabaseType>(value,out result)==false)
+                    throw new Exception("Database type error");
+
+                _dbType = value; 
+            }
         }
 
         /// <summary>

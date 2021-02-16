@@ -10,11 +10,23 @@ namespace DatabaseMaster2
     {
         private ConnectionConfig _connectionConfig;
         private DatabaseInterface _database;
+        private SelectDBCommandBuilder sql = new SelectDBCommandBuilder();
 
-        public DatabaseGetData(ConnectionConfig config, DatabaseInterface database)
+        public DatabaseGetData(ConnectionConfig config, DatabaseInterface database, String
+            TableName)
         {
             _connectionConfig = config;
             _database = database;
+            if(!String.IsNullOrEmpty(TableName))
+                sql.AddSelectTable(TableName);
+        }
+
+        public DatabaseGetData(ConnectionConfig config, DatabaseInterface database, List<string> TableName)
+        {
+            _connectionConfig = config;
+            _database = database;
+            if (TableName.Count>0)
+                sql.AddSelectTable(TableName);
         }
 
 
@@ -46,192 +58,25 @@ namespace DatabaseMaster2
             }
         }
 
+        /// <summary>
+        /// clear filter
+        /// 清除过滤条件
+        /// </summary>
+        /// <returns></returns>
+        public DatabaseGetData Clear()
+        {
+            sql.ClearCommand();
+           
+            return this;
+        }
 
         /// <summary>
         /// get all data
         /// 得到表中所有数据
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="OrderByName"></param>
         /// <returns></returns>
-        public IDataTable Data(String TableName, String OrderByName="", SortMode sortMode=SortMode.Ascending)
+        public IDataTable Data()
         {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-
-        /// <summary>
-        /// get data by filter
-        /// 得到指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="OrderByName"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, object Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            sql.AddWhere(WhereRelation.None, ColumnName, CommandComparison.Equals, Value);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// get data by filter
-        /// 得到指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, CommandComparison Comparison,
-            object Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            sql.AddWhere(WhereRelation.None, ColumnName, (CommandComparison)Comparison, Value);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// get data by filter
-        /// 得到得到多个指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] ColumnName, object[] Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], CommandComparison.Equals, Value[i]);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-
-        /// <summary>
-        /// get data by filter
-        /// 得到得到多个指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] ColumnName, CommandComparison[] Comparison,
-            object[] Value, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// get data by filter
-        /// 得到得到多个指定条件的表中所有数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="raRelation"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="sortMode"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] ColumnName, CommandComparison[] Comparison,
-            object[] Value,WhereRelation[] raRelation, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(raRelation[i], ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-            if (String.IsNullOrEmpty(OrderByName) == false)
-                sql.AddOrderBy(OrderByName, sortMode);
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -245,62 +90,250 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// get data by filter
-        /// 得到得到多个指定条件的表中所有数据
+        /// check data exist
+        /// 检查表中是否存在指定内容
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="GroupColumnName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="GroupByName"></param>
         /// <returns></returns>
-        public IDataTable Data(string TableName, List<string> GroupColumnName, string[] ColumnName,
-            CommandComparison[] Comparison, object[] Value, string GroupByName)
+        public bool Exist()
         {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(GroupColumnName);
-
-            sql.AddGroupBy(GroupByName);
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-
+            sql.SelectCount = true;
 
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
+            var count = Convert.ToInt64(_database.GetSpeciaRecordValue(sql.BuildCommand(),
+                _connectionConfig.WaitTimeout));
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
+            if (count == 0)
+                return false;
+            else
+                return true;
+        }
+
+        /// <summary>
+        /// get first data by filter
+        /// 得到指定条件的一个数据
+        /// </summary>
+        /// <returns></returns>
+        public object First()
+        {
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            return result;
+        }
+
+        /// <summary>
+        /// get all data
+        /// 得到表中计数
+        /// </summary>
+        /// <param name="OrderByName"></param>
+        /// <param name="sortMode"></param>
+        /// <returns></returns>
+        public object Count()
+        {
+            sql.SelectCount = true;
+
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+            return result;
+
+        }
+
+        /// <summary>
+        /// get all data
+        /// 得到表中指定行数数据
+        /// </summary>
+        /// <param name="OrderByName"></param>
+        /// <param name="sortMode"></param>
+        /// <returns></returns>
+        public DatabaseGetData TopNumber(Int32 RowsNumber)
+        {
+            sql.TopRecords= RowsNumber;
+
+            return this;
+        }
+
+        /// <summary>
+        /// get all columns
+        /// 得到表中所有列
+        /// </summary>
+        /// <param name="OrderByName"></param>
+        /// <param name="sortMode"></param>
+        /// <returns></returns>
+        public DatabaseGetData Columns()
+        {
+            sql.AddSelectALLColumn();
+         
+            return this;
+        }
+
+        /// <summary>
+        /// get columns list
+        /// 得到表中指定列
+        /// </summary>
+        /// <returns></returns>
+        public DatabaseGetData Columns(String ColumnName)
+        {
+            sql.AddSelectColumn(ColumnName);
+
+            return this;
+        }
+
+        /// <summary>
+        /// get columns list
+        /// 得到表中指定列
+        /// </summary>
+        /// <param name="OrderByName"></param>
+        /// <param name="sortMode"></param>
+        /// <returns></returns>
+        public DatabaseGetData Columns(List<string> ColumnName)
+        {
+            sql.AddSelectColumn(ColumnName);
+           
+            return this;
+        }
+
+        /// <summary>
+        /// set sort
+        /// 指定排序条件
+        /// </summary>
+        /// <param name="OrderByName"></param>
+        /// <param name="sortMode"></param>
+        /// <returns></returns>
+        public DatabaseGetData OrderBy(String OrderByName, SortMode sortMode = SortMode.Ascending)
+        {
+            if (String.IsNullOrEmpty(OrderByName) == false)
+                sql.AddOrderBy(OrderByName, sortMode);
+
+            return this;
+        }
+
+        /// <summary>
+        /// set group name
+        /// 指定分组字段
+        /// </summary>
+        /// <param name="GroupByName"></param>
+        /// <returns></returns>
+        public DatabaseGetData GroupBy(string GroupByName)
+        {
+            sql.AddGroupBy(GroupByName);
+
+            return this;
+        }
+
+
+        /// <summary>
+        /// get data by filter
+        /// 设定表中指定条件
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="Value"></param>
+        /// <param name="OrderByName"></param>
+        /// <param name="sortMode"></param>
+        /// <returns></returns>
+        public DatabaseGetData Where(string ColumnName, object Value)
+        {
+            sql.AddWhere(WhereRelation.And, ColumnName, CommandComparison.Equals, Value);
+
+            return this;
         }
 
         /// <summary>
         /// get data by filter
-        /// 得到得到多个指定条件的表中所有数据
+        /// 设定表中指定条件
         /// </summary>
-        /// <param name="TableName"></param>
+        /// <param name="ColumnName"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public DatabaseGetData Where(string ColumnName, CommandComparison Comparison,object Value)
+        {
+            sql.AddWhere(WhereRelation.And, ColumnName, (CommandComparison)Comparison, Value);
+       
+            return this;
+        }
+
+        /// <summary>
+        /// get data by filter
+        /// 设定表中指定条件
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public DatabaseGetData Where(string[] ColumnName, object[] Value)
+        {
+            for (var i = 0; i < ColumnName.Length; i++)
+                sql.AddWhere(WhereRelation.And, ColumnName[i], CommandComparison.Equals, Value[i]);
+
+            return this;
+        }
+
+
+        /// <summary>
+        /// get data by filter
+        /// 设定表中指定条件
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public DatabaseGetData Where(string[] ColumnName, CommandComparison[] Comparison,
+            object[] Value)
+        {
+            for(var i = 0; i < ColumnName.Length; i++)
+                sql.AddWhere(WhereRelation.And, ColumnName[i], Comparison[i], Value[i]);
+
+            return this;
+        }
+
+        /// <summary>
+        /// get data by filter
+        /// 设定表中指定条件
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="Value"></param>
+        /// <param name="raRelation"></param>
+        /// <returns></returns>
+        public DatabaseGetData Where(string[] ColumnName, CommandComparison[] Comparison,
+            object[] Value,WhereRelation[] raRelation)
+        {
+            for (var i = 0; i < ColumnName.Length; i++)
+                sql.AddWhere(raRelation[i], ColumnName[i], Comparison[i], Value[i]);
+          
+            return this;
+        }
+
+
+        /// <summary>
+        /// get data by filter
+        /// 设定表中指定条件
+        /// </summary>
         /// <param name="ColumnName"></param>
         /// <param name="Comparison"></param>
         /// <param name="Value"></param>
         /// <param name="Table1ColumnName"></param>
         /// <param name="Table2ColumnName"></param>
         /// <returns></returns>
-        public IDataTable Data(List<string> TableName, string[] ColumnName, CommandComparison[] Comparison,
+        public DatabaseGetData Where(string[] ColumnName, CommandComparison[] Comparison,
             object[] Value,
             string[] Table1ColumnName, string[] Table2ColumnName)
         {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
             for (var i = 0; i < ColumnName.Length; i++)
                 sql.AddWhere(WhereRelation.And, ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
 
@@ -308,227 +341,57 @@ namespace DatabaseMaster2
                 sql.AddWhereByRelationShip(WhereRelation.And, Table1ColumnName[i], CommandComparison.Equals,
                     Table2ColumnName[i]);
 
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
+            return this;
         }
 
         /// <summary>
         /// get data by filter
-        /// 得到得到多个指定条件的表中所有数据
+        /// 设定表中指定条件
         /// </summary>
-        /// <param name="TableName"></param>
         /// <param name="Table1ColumnName"></param>
         /// <param name="Table2ColumnName"></param>
         /// <returns></returns>
-        public IDataTable Data(List<string> TableName, string[] Table1ColumnName, string[] Table2ColumnName)
+        public DatabaseGetData Where(string[] Table1ColumnName, string[] Table2ColumnName)
         {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-
             for (var i = 0; i < Table1ColumnName.Length; i++)
                 sql.AddWhereByRelationShip(WhereRelation.And, Table1ColumnName[i], CommandComparison.Equals,
                     Table2ColumnName[i]);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
+            
+            return this;
         }
+
 
 
         /// <summary>
         /// get data by filter
-        /// 得到得到多个指定条件的表中所有数据
+        /// 设定表中指定条件
+        /// </summary>
+        /// <param name="MatchColumn"></param>
+        /// <param name="Comparison"></param>
+        /// <param name="MatchValue"></param>
+        /// <returns></returns>
+        public DatabaseGetData Where(string MatchColumn,
+            CommandComparison Comparison, object[] MatchValue)
+        {
+            sql.AddWhere(WhereRelation.And, MatchColumn, Comparison, MatchValue);
+
+            return this;
+        }
+
+         /// <summary>
+        /// get columns data by filter
+        /// 得到指定数据的指定内容
         /// </summary>
         /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
         /// <param name="KeyColumnName"></param>
         /// <param name="KeyValue"></param>
         /// <returns></returns>
-        public IDataTable Data(string TableName, List<string> ColumnName, string KeyColumnName,
-            object KeyValue)
+        public DatabaseGetData Max(string ColumnName)
         {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.AddWhere(WhereRelation.None, KeyColumnName, CommandComparison.Equals, KeyValue);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// check data exist
-        /// 检查表中是否存在指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public bool Exist(string TableName, string ColumnName, object Value)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-            sql.AddWhere(WhereRelation.None, ColumnName, CommandComparison.Equals, Value);
-            sql.SelectCount = true;
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var count = Convert.ToInt64(_database.GetSpeciaRecordValue(sql.BuildCommand(),
-                _connectionConfig.WaitTimeout));
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            if (count == 0)
-                return false;
-            else
-                return true;
-        }
-
-        /// <summary>
-        /// check data exist
-        /// 检查表中是否存在指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public bool Exist(string TableName, string[] ColumnName, object[] Value)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], CommandComparison.Equals, Value[i]);
-
-
-            sql.SelectCount = true;
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var count = Convert.ToInt64(_database.GetSpeciaRecordValue(sql.BuildCommand(),
-                _connectionConfig.WaitTimeout));
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            if (count == 0)
-                return false;
-            else
-                return true;
-        }
-
-        /// <summary>
-        /// check data exist
-        /// 检查表中是否存在指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public bool Exist(string TableName, string[] ColumnName, CommandComparison[] Comparison,
-            object[] Value)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-
-
-            sql.SelectCount = true;
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var count = Convert.ToInt64(_database.GetSpeciaRecordValue(sql.BuildCommand(),
-                _connectionConfig.WaitTimeout));
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            if (count == 0)
-                return false;
-            else
-                return true;
-        }
-
-        /// <summary>
-        /// check data exist
-        /// 检查表中是否存在指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="Value"></param>
-        /// <param name="relation"></param>
-        /// <returns></returns>
-        public bool Exist(string TableName, string[] ColumnName, CommandComparison[] Comparison,
-            object[] Value,WhereRelation[] relation)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            for (var i = 0; i < ColumnName.Length; i++)
-                sql.AddWhere(relation[i], ColumnName[i], (CommandComparison)Comparison[i], Value[i]);
-
-
-            sql.SelectCount = true;
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var count = Convert.ToInt64(_database.GetSpeciaRecordValue(sql.BuildCommand(),
-                _connectionConfig.WaitTimeout));
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            if (count == 0)
-                return false;
-            else
-                return true;
+            sql.AddSelectColumn("max(" + ColumnName + ")");
+          
+            return this;
         }
 
         /// <summary>
@@ -692,734 +555,6 @@ namespace DatabaseMaster2
                 dt[i].table = ds.Tables[i];
             }
             return dt;
-        }
-
-        /// <summary>'
-        /// get first data by filter
-        /// 得到指定条件的一个数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <returns></returns>
-        public object First(string TableName, string ColumnName, string KeyColumnName, object KeyValue)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.AddWhere(WhereRelation.None, KeyColumnName, CommandComparison.Equals, KeyValue);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
-        }
-
-
-        /// <summary>
-        /// get first data by filter
-        /// 得到指定条件的一个数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <returns></returns>
-        public object First(string TableName, string ColumnName, string[] KeyColumnName, object[] KeyValue)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
-        }
-
-        /// <summary>
-        /// get count data by filter
-        ///  得到指定条件的行计数数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="CountNumber"></param>
-        /// <returns></returns>
-        public object First(string TableName, string ColumnName, string[] KeyColumnName, object[] KeyValue,
-            bool CountNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.SelectCount = true;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
-        }
-
-        /// <summary>
-        /// get count data by filter
-        ///  得到指定条件的行计数数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="CountNumber"></param>
-        /// <returns></returns>
-        public object First(string TableName, string ColumnName, string[] KeyColumnName,
-            CommandComparison[] Comparison, object[] KeyValue, bool CountNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.SelectCount = true;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
-        }
-
-        /// <summary>
-        /// get count data by filter
-        ///  得到指定条件的行计数数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="relation"></param>
-        /// <param name="CountNumber"></param>
-        /// <returns></returns>
-        public object First(string TableName, string ColumnName, string[] KeyColumnName,
-            CommandComparison[] Comparison, object[] KeyValue,WhereRelation[] relation, bool CountNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.SelectCount = true;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(relation[i], KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
-        }
-
-        /// <summary>
-        /// get count data by filter
-        ///  得到指定条件的行计数数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="CountNumber"></param>
-        /// <returns></returns>
-        public object First(string TableName, string ColumnName, bool CountNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.SelectCount = true;
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var result = _database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
-        }
-
-
-        /// <summary>
-        /// get recordnumber data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="RecordNumber"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, string KeyColumnName, object KeyValue,
-            int RecordNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.AddWhere(WhereRelation.None, KeyColumnName, CommandComparison.Equals, KeyValue);
-            sql.TopRecords = RecordNumber;
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-        /// <summary>
-        /// get recordnumber data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="RecordNumber"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, int RecordNumber, string ColumnName,String OrderByName= "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-            sql.TopRecords = RecordNumber;
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-        /// <summary>
-        /// get recordnumber data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="RecordNumber"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, string[] KeyColumnName,
-            object[] KeyValue, int RecordNumber, String OrderByName= "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-            sql.TopRecords = RecordNumber;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-        /// <summary>
-        /// get recordnumber data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="OrderByName"></param>
-        /// <param name="RecordNumber"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, string[] KeyColumnName,
-            CommandComparison[] Comparison, object[] KeyValue,  int RecordNumber, String OrderByName = "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-            sql.TopRecords = RecordNumber;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], (CommandComparison)Comparison[i], KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-
-        /// <summary>
-        /// get recordnumber data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="RecordNumber"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] KeyColumnName, object[] KeyValue,
-            int RecordNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            sql.TopRecords = RecordNumber;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-        /// <summary>
-        /// get recordnumber data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="RecordNumber"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] KeyColumnName, CommandComparison[] Comparison,
-            object[] KeyValue, int RecordNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            sql.TopRecords = RecordNumber;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], (CommandComparison)Comparison[i], KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-        /// <summary>
-        /// get recordnumber data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="KeyValue"></param>
-        /// <param name="RecordNumber"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string[] KeyColumnName, CommandComparison[] Comparison,
-            object[] KeyValue,WhereRelation[] relation, int RecordNumber)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectALLColumn();
-
-            sql.TopRecords = RecordNumber;
-
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(relation[i], KeyColumnName[i], (CommandComparison)Comparison[i], KeyValue[i]);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <returns></returns>
-        public IDataTable Data(string TableName, string ColumnName, string KeyColumnName, object KeyValue)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn("max(" + ColumnName + ")");
-            sql.AddWhere(WhereRelation.None, KeyColumnName, CommandComparison.Equals, KeyValue);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var dt = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout).Tables[0];
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable();
-            DT.table = dt;
-            return DT;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
-        /// <returns></returns>
-        public long Max(string TableName, string ColumnName, string KeyColumnName, object KeyValue)
-        {
-            long Value;
-
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn("max(" + ColumnName + ")");
-            sql.AddWhere(WhereRelation.None, KeyColumnName, CommandComparison.Equals, KeyValue);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            Value = Convert.ToInt64(_database.GetSpeciaRecordValue(sql.BuildCommand(), _connectionConfig.WaitTimeout));
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return Value;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, String OrderByName= "", SortMode sortMode = SortMode.Ascending)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            if (String.IsNullOrEmpty(OrderByName)==false)
-                sql.AddOrderBy(OrderByName, sortMode);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="MatchColumn"></param>
-        /// <param name="MatchValue"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, string MatchColumn,
-            object MatchValue)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.AddWhere(WhereRelation.None, MatchColumn, CommandComparison.Equals, MatchValue);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="MatchColumn"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="MatchValue"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, string MatchColumn,
-            CommandComparison Comparison, object MatchValue)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.AddWhere(WhereRelation.None, MatchColumn, (CommandComparison)Comparison, MatchValue);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="MatchColumn"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="MatchValue"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, string MatchColumn,
-            CommandComparison Comparison, object[] MatchValue)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-            sql.AddWhere(WhereRelation.None, MatchColumn, (CommandComparison)Comparison, MatchValue);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="MatchColumn"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="MatchValue"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, string[] MatchColumn,
-            CommandComparison[] Comparison, object[] MatchValue)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-
-            for (var i = 0; i < MatchColumn.Length; i++)
-                sql.AddWhere(WhereRelation.And, MatchColumn[i], (CommandComparison)Comparison[i], MatchValue[i]);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="MatchColumn"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="MatchValue"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, string[] MatchColumn,
-            CommandComparison[] Comparison, object[] MatchValue,WhereRelation[] relation)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-
-            for (var i = 0; i < MatchColumn.Length; i++)
-                sql.AddWhere(relation[i], MatchColumn[i], (CommandComparison)Comparison[i], MatchValue[i]);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable { table = ds.Tables[0] };
-            return DT;
-        }
-
-        /// <summary>
-        /// get columns data by filter
-        /// 得到指定数据的指定内容
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="MatchColumn"></param>
-        /// <param name="Comparison"></param>
-        /// <param name="MatchValue"></param>
-        /// <param name="GroupByName"></param>
-        /// <returns></returns>
-        public IDataTable ColumnData(string TableName, List<string> ColumnName, string[] MatchColumn,
-            CommandComparison[] Comparison, object[] MatchValue, string GroupByName)
-        {
-            //sql生成
-            var sql = new SelectDBCommandBuilder();
-            sql.AddSelectTable(TableName);
-            sql.AddSelectColumn(ColumnName);
-
-            for (var i = 0; i < MatchColumn.Length; i++)
-                sql.AddWhere(WhereRelation.And, MatchColumn[i], (CommandComparison)Comparison[i], MatchValue[i]);
-
-            sql.AddGroupBy(GroupByName);
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            var ds = _database.GetDataSet(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            IDataTable DT = new IDataTable {table = ds.Tables[0]};
-            return DT;
         }
     }
 }

@@ -15,47 +15,44 @@ namespace DatabaseMaster2
         private MongoDBDatabase _database;
         private string _databasename;
 
-        public MongoUpdateData(ConnectionConfig config, MongoDBDatabase database, String DatabaseName)
+        private String _TableName;
+        private FilterDefinition<BsonDocument> filterDefinition;
+        Hashtable htData = new Hashtable();
+
+        public MongoUpdateData(ConnectionConfig config, MongoDBDatabase database, String DatabaseName, String TableName)
         {
             _connectionConfig = config;
             _database = database;
             _databasename = DatabaseName;
+            _TableName = TableName;
+        }
+
+        /// <summary>
+        /// clear filter
+        /// 清除过滤条件
+        /// </summary>
+        /// <returns></returns>
+        public MongoUpdateData Clear()
+        {
+            htData.Clear();
+            filterDefinition = null;
+
+            return this;
         }
 
         /// <summary>
         /// update new data
         /// 更新数据
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="KeyValue"></param>
         /// <returns></returns>
-        public Int32 Data(String TableName, String[] ColumnName, Object[] Value, String KeyColumnName,
-            Object KeyValue)
+        public Int32 ExecuteCommand()
         {
-
-
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            Hashtable ht = new Hashtable();
-
-            for (int i = 0; i < ColumnName.Length; i++)
-            {
-                ht.Add(ColumnName[i], Value[i]);
-            }
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            Int32 count = _database.UpdateData(_databasename, TableName,
-                MongoDBOP.GetFilterOP(KeyColumnName, KeyValue, CommandComparison.Equals), ht);
+            Int32 count = _database.UpdateData(_databasename, _TableName,filterDefinition, htData);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
@@ -66,40 +63,56 @@ namespace DatabaseMaster2
         /// update new data
         /// 更新数据
         /// </summary>
-        /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
         /// <param name="Value"></param>
+        /// <returns></returns>
+        public MongoUpdateData Data(String[] ColumnName, Object[] Value)
+        {
+
+            if (ColumnName.Length != Value.Length)
+            {
+                throw new Exception("Column number not Equals Value number");
+            }
+
+
+            for (int i = 0; i < ColumnName.Length; i++)
+            {
+                htData.Add(ColumnName[i], Value[i]);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// update new data
+        /// 更新数据
+        /// </summary>
         /// <param name="KeyColumnName"></param>
         /// <param name="KeyValue"></param>
         /// <returns></returns>
-        public Int32 Data(String TableName, String[] ColumnName, Object[] Value, String KeyColumnName,
+        public MongoUpdateData Where(String KeyColumnName,Object KeyValue)
+        {
+
+            filterDefinition = MongoDBOP.GetFilterOP(KeyColumnName, KeyValue, CommandComparison.Equals);
+
+            return this;
+        }
+
+        /// <summary>
+        /// update new data
+        /// 更新数据
+        /// </summary>
+        /// <param name="KeyColumnName"></param>
+        /// <param name="comparison"></param>
+        /// <param name="KeyValue"></param>
+        /// <returns></returns>
+        public MongoUpdateData Where(String KeyColumnName,
             CommandComparison comparison, Object KeyValue)
         {
 
+            filterDefinition = MongoDBOP.GetFilterOP(KeyColumnName, KeyValue, comparison);
 
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            Hashtable ht = new Hashtable();
-
-            for (int i = 0; i < ColumnName.Length; i++)
-            {
-                ht.Add(ColumnName[i], Value[i]);
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            Int32 count = _database.UpdateData(_databasename, TableName,
-                MongoDBOP.GetFilterOP(KeyColumnName, KeyValue, comparison), ht);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return count;
+            return this;
         }
 
 
@@ -107,91 +120,34 @@ namespace DatabaseMaster2
         /// update many new data
         /// 更新多个数据
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
         /// <param name="KeyColumnName"></param>
         /// <param name="KeyValue"></param>
         /// <returns></returns>
-        public Int32 Data(String TableName, String[] ColumnName, Object[] Value, String[] KeyColumnName,
+        public MongoUpdateData Where(String[] KeyColumnName,
             Object[] KeyValue)
         {
 
+           filterDefinition= MongoDBOP.GetWhere(KeyColumnName, KeyValue);
 
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            if (KeyColumnName.Length != KeyValue.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            Hashtable ht = new Hashtable();
-
-            for (int i = 0; i < ColumnName.Length; i++)
-            {
-                ht.Add(ColumnName[i], Value[i]);
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            Int32 count = _database.UpdateData(_databasename, TableName,
-                MongoDBOP.GetWhere(KeyColumnName, KeyValue), ht);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return count;
+            return this;
         }
 
         /// <summary>
         /// update many new data
         /// 更新多个数据
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
         /// <param name="KeyColumnName"></param>
+        /// <param name="comparison"></param>
         /// <param name="KeyValue"></param>
+        /// <param name="relation"></param>
         /// <returns></returns>
-        public Int32 Data(String TableName, String[] ColumnName, Object[] Value, String[] KeyColumnName,
+        public MongoUpdateData Where(String[] KeyColumnName,
             CommandComparison[] comparison, Object[] KeyValue, WhereRelation[] relation)
         {
 
+           filterDefinition= MongoDBOP.GetWhere(KeyColumnName, KeyValue, comparison, relation);
 
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            if (KeyColumnName.Length != KeyValue.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            Hashtable ht = new Hashtable();
-
-            for (int i = 0; i < ColumnName.Length; i++)
-            {
-                ht.Add(ColumnName[i], Value[i]);
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            Int32 count = _database.UpdateData(_databasename, TableName,
-                MongoDBOP.GetWhere(KeyColumnName, KeyValue, comparison, relation),
-                ht);
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return count;
+            return this;
         }
 
     }

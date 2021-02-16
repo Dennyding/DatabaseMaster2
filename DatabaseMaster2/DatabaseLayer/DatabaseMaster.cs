@@ -44,44 +44,55 @@ namespace DatabaseMaster2
         /// Query data
         /// 查询数据
         /// </summary>
-        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public DatabaseGetData Queryable()
+        public DatabaseGetData Queryable(String TableName)
         {
-            return new DatabaseGetData(_connectionConfig, database);
+            return new DatabaseGetData(_connectionConfig, database, TableName);
+        }
+
+        /// <summary>
+        /// Query data
+        /// 查询数据
+        /// </summary>
+        /// <param name="TableName">TableName 数据表名称</param>
+        /// <returns></returns>
+        public DatabaseGetData Queryable(List<string> TableName)
+        {
+            return new DatabaseGetData(_connectionConfig, database, TableName);
         }
 
         /// <summary>
         /// Update data
         /// 更新数据
         /// </summary>
-        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public DatabaseUpdateData Updateable()
+        public DatabaseUpdateData Updateable(String TableName)
         {
-            return new DatabaseUpdateData(_connectionConfig, database);
+            return new DatabaseUpdateData(_connectionConfig, database, TableName);
         }
 
         /// <summary>
         /// Delete data
         /// 删除数据
         /// </summary>
-        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public DatabaseDeleteData Deleteable()
+        public DatabaseDeleteData Deleteable(String TableName)
         {
-            return new DatabaseDeleteData(_connectionConfig, database);
+            return new DatabaseDeleteData(_connectionConfig, database, TableName);
         }
 
         /// <summary>
         /// Insert data
         /// 插入数据
         /// </summary>
-        /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public DatabaseInsertData Insertable()
+        public DatabaseInsertData Insertable(String TableName)
         {
-            return new DatabaseInsertData(_connectionConfig, database);
+            return new DatabaseInsertData(_connectionConfig, database, TableName);
         }
     }
 
@@ -106,10 +117,11 @@ namespace DatabaseMaster2
         /// 查询数据
         /// </summary>
         /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public MongoGetData Queryable(String databaseName)
+        public MongoGetData Queryable(String databaseName, String TableName)
         {
-            return new MongoGetData(_connectionConfig, database, databaseName);
+            return new MongoGetData(_connectionConfig, database, databaseName, TableName);
         }
 
         /// <summary>
@@ -117,10 +129,11 @@ namespace DatabaseMaster2
         /// 更新数据
         /// </summary>
         /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public MongoUpdateData Updateable(String databaseName)
+        public MongoUpdateData Updateable(String databaseName, String TableName)
         {
-            return new MongoUpdateData(_connectionConfig, database, databaseName);
+            return new MongoUpdateData(_connectionConfig, database, databaseName, TableName);
         }
 
         /// <summary>
@@ -128,10 +141,11 @@ namespace DatabaseMaster2
         /// 删除数据
         /// </summary>
         /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public MongoDeleteData Deleteable(String databaseName)
+        public MongoDeleteData Deleteable(String databaseName, String TableName)
         {
-            return new MongoDeleteData(_connectionConfig, database, databaseName);
+            return new MongoDeleteData(_connectionConfig, database, databaseName, TableName);
         }
 
         /// <summary>
@@ -139,10 +153,11 @@ namespace DatabaseMaster2
         /// 插入数据
         /// </summary>
         /// <param name="databaseName">database-name 数据库名称</param>
+        /// <param name="TableName">TableName 数据表名称</param>
         /// <returns></returns>
-        public MongoInsertData Insertable(String databaseName)
+        public MongoInsertData Insertable(String databaseName, String TableName)
         {
-            return new MongoInsertData(_connectionConfig, database, databaseName);
+            return new MongoInsertData(_connectionConfig, database, databaseName, TableName);
         }
 
         /// <summary>

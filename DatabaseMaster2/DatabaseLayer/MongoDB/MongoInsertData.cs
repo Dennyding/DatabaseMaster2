@@ -15,108 +15,61 @@ namespace DatabaseMaster2
         private MongoDBDatabase _database;
         private string _databasename;
 
-        public MongoInsertData(ConnectionConfig config, MongoDBDatabase database, String DatabaseName)
+        private String _TableName;
+        Hashtable htData = new Hashtable();
+
+        public MongoInsertData(ConnectionConfig config, MongoDBDatabase database, String DatabaseName, String TableName)
         {
             _connectionConfig = config;
             _database = database;
             _databasename = DatabaseName;
-        }
-
-
-        /// <summary>
-        /// insert new data
-        /// 插入新数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        public void Data(String TableName, String[] ColumnName, Object[] Value)
-        {
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            Hashtable ht = new Hashtable();
-
-            for (int i = 0; i < ColumnName.Length; i++)
-            {
-                ht.Add(ColumnName[i], Value[i]);
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            _database.InsertData(_databasename, TableName, MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(MongoDBOP.HashtableToJson(ht)));
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return;
-        }
-
-
-        /// <summary>
-        /// insert new data
-        /// 插入新数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        public void Data(String TableName, Hashtable ht)
-        {
-
-
-            if (ht.Count == 0)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            _database.InsertData(_databasename, TableName, MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(MongoDBOP.HashtableToJson(ht)));
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return;
+            _TableName = TableName;
         }
 
         /// <summary>
-        /// insert new data and return key
-        /// 插入数据并返回唯一字符串主键
+        /// clear filter
+        /// 清除过滤条件
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="GUIDValue"></param>
         /// <returns></returns>
-        public String Data(String TableName, String[] ColumnName, Object[] Value, String KeyColumnName, String GUIDValue)
+        public MongoInsertData Clear()
         {
+            htData.Clear();
 
+            return this;
+        }
 
-            if (ColumnName.Length != Value.Length)
-            {
-                throw new Exception("Column number not Equals Value number");
-            }
+        /// <summary>
+        /// insert new data
+        /// 插入新数据
+        /// </summary>
+        public void ExecuteCommand()
+        {
+          
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+            _database.InsertData(_databasename, _TableName, MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(MongoDBOP.HashtableToJson(htData)));
 
-            Hashtable ht = new Hashtable();
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            for (int i = 0; i < ColumnName.Length; i++)
-            {
-                ht.Add(ColumnName[i], Value[i]);
-            }
+            return;
+        }
+
+        /// <summary>
+        /// insert new data
+        /// 插入新数据
+        /// </summary>
+        public String ExecuteCommand(String KeyColumnName, String GUIDValue)
+        {
 
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            String s = _database.InsertData(_databasename, TableName, MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(MongoDBOP.HashtableToJson(ht))
+            String s = _database.InsertData(_databasename, _TableName, MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(MongoDBOP.HashtableToJson(htData))
                 , KeyColumnName, GUIDValue);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
@@ -124,49 +77,57 @@ namespace DatabaseMaster2
             return s;
         }
 
+        /// <summary>
+        /// insert new data
+        /// 插入新数据
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="Value"></param>
+        public MongoInsertData Data(String[] ColumnName, Object[] Value)
+        {
+            if (ColumnName.Length != Value.Length)
+            {
+                throw new Exception("Column number not Equals Value number");
+            }
+
+            for (int i = 0; i < ColumnName.Length; i++)
+            {
+                htData.Add(ColumnName[i], Value[i]);
+            }
+
+            return this;
+        }
+
 
         /// <summary>
-        /// insert new data and return key
-        /// 插入数据并返回唯一字符串主键
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ht"></param>
-        /// <param name="KeyColumnName"></param>
-        /// <param name="GUIDValue"></param>
-        /// <returns></returns>
-        public String Data(String TableName, Hashtable ht, String KeyColumnName, String GUIDValue)
+        /// insert new data
+        /// 插入新数据
+        /// </summary>       
+        /// <param name="ColumnName"></param>
+        /// <param name="Value"></param>
+        public MongoInsertData Data(Hashtable ht)
         {
-
 
             if (ht.Count == 0)
             {
                 throw new Exception("Column number not Equals Value number");
             }
 
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            String s = _database.InsertData(_databasename, TableName, MongoDB.Bson.Serialization.BsonSerializer.Deserialize<BsonDocument>(MongoDBOP.HashtableToJson(ht))
-                 , KeyColumnName, GUIDValue);
+            htData = ht;
 
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return s;
+            return this;
         }
+
+
+
 
         /// <summary>
         /// insert many new data
         /// 插入多个新数据
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        public void Data(String TableName, List<Hashtable> ht)
+        /// <param name="ht"></param>
+        public void ExecuteCommand(List<Hashtable> ht)
         {
-
-
             if (ht.Count == 0)
             {
                 throw new Exception("Column number not Equals Value number");
@@ -182,7 +143,7 @@ namespace DatabaseMaster2
                 if (_database.CheckStatus() == false)
                     throw new Exception("databse connect not open");
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-            _database.InsertData(_databasename, TableName, document);
+            _database.InsertData(_databasename, _TableName, document);
 
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 

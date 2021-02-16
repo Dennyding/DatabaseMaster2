@@ -23,9 +23,6 @@ namespace DatabaseMaster2
         public static FilterDefinition<BsonDocument> GetFilterOP(String ColumnName, Object Value,
             CommandComparison comparison)
         {
-            Object[] v;
-            String[] s;
-
             switch ((int)comparison)
             {
                 case 1:

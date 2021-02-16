@@ -10,29 +10,36 @@ namespace DatabaseMaster2
     {
         private ConnectionConfig _connectionConfig;
         private DatabaseInterface _database;
+        private InsertDBCommandBuilder sql = new InsertDBCommandBuilder();
 
-        public DatabaseInsertData(ConnectionConfig config, DatabaseInterface database)
+        public DatabaseInsertData(ConnectionConfig config, DatabaseInterface database, String
+            TableName)
         {
             _connectionConfig = config;
             _database = database;
+            if (!String.IsNullOrEmpty(TableName))
+                sql.TableName = TableName;
         }
 
         /// <summary>
-        /// insert new data
-        /// 插入新数据
+        /// clear filter
+        /// 清除过滤条件
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
         /// <returns></returns>
-        public int Data(string TableName, string[] ColumnName, object[] Value)
+        public DatabaseInsertData Clear()
         {
-            //sql生成
-            var sql = new InsertDBCommandBuilder();
-            sql.TableName = TableName;
-            sql.AddInsertColumn(ColumnName, Value);
+            sql.ClearCommand();
 
+            return this;
+        }
 
+        /// <summary>
+        /// update new data
+        /// 更新数据
+        /// </summary>
+        /// <returns></returns>
+        public Int32 ExecuteCommand()
+        {
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -43,140 +50,105 @@ namespace DatabaseMaster2
             var result = _database.ExecueCommand(sql.BuildCommand(), _connectionConfig.WaitTimeout);
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
-            return result;
-        }
-
-        /// <summary>
-        /// insert new data
-        /// 插入新数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <returns></returns>
-        public int Data(string TableName, object[] Value)
-        {
-            //sql生成
-            var sql = new InsertDBCommandBuilder();
-            sql.TableName = TableName;
-            sql.AddInsertColumn(Value);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            var result = _database.ExecueCommand(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
             return result;
         }
 
-        /// <summary>
-        /// insert new data
-        /// 插入新数据
-        /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="ReturnID"></param>
-        /// <returns></returns>
-        public object Data(string TableName, string[] ColumnName, DatabaseType DatabaseModule, object[] Value,
-            bool ReturnID)
-        {
-            //sql生成
-            var sql = new InsertDBCommandBuilder();
-            sql.TableName = TableName;
-            sql.DatabaseModule = DatabaseModule;
-            sql.SetSelectIdentity = true;
-            sql.AddInsertColumn(ColumnName, Value);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            object result = _database.ExecueCommand(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
-        }
+     
 
         /// <summary>
-        /// insert new data
-        /// 插入新数据
+        /// update new data
+        /// 更新数据
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
-        /// <param name="ReturnID"></param>
         /// <returns></returns>
-        public object Data(string TableName, DatabaseType DatabaseModule, object[] Value, bool ReturnID)
+        public Boolean ExecuteCommandChanged()
         {
-            //sql生成
-            var sql = new InsertDBCommandBuilder();
-            sql.TableName = TableName;
-            sql.DatabaseModule = DatabaseModule;
-            sql.SetSelectIdentity = true;
-            sql.AddInsertColumn(Value);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            object result = _database.ExecueCommand(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
+            return ExecuteCommand() > 0;
         }
 
         /// <summary>
         /// insert many new data
         /// 插入多个新数据
         /// </summary>
-        /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public int Data(string TableName, string[] ColumnName, List<object[]> Value)
+        public DatabaseInsertData Data(string[] ColumnName, object[] Value)
+        {
+            sql.AddInsertColumn(ColumnName, Value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// insert many new data
+        /// 插入多个新数据
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public DatabaseInsertData Data(object[] Value)
+        {
+            sql.AddInsertColumn(Value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// insert many new data
+        /// 插入多个新数据
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="DatabaseModule"></param>
+        /// <param name="Value"></param>
+        /// <param name="ReturnID"></param>
+        /// <returns></returns>
+        public DatabaseInsertData Data(string[] ColumnName, DatabaseType DatabaseModule, object[] Value,
+            bool ReturnID)
+        {
+            sql.DatabaseModule = DatabaseModule;
+            sql.SetSelectIdentity = true;
+            sql.AddInsertColumn(ColumnName, Value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// insert many new data
+        /// 插入多个新数据
+        /// </summary>
+        /// <param name="DatabaseModule"></param>
+        /// <param name="Value"></param>
+        /// <param name="ReturnID"></param>
+        /// <returns></returns>
+        public DatabaseInsertData Data(DatabaseType DatabaseModule, object[] Value, bool ReturnID)
+        {
+            sql.DatabaseModule = DatabaseModule;
+            sql.SetSelectIdentity = true;
+            sql.AddInsertColumn(Value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// insert many new data
+        /// 插入多个新数据
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public DatabaseInsertData Data(string[] ColumnName, List<object[]> Value)
         {
             var InsertBatch = "";
-
-
-            //sql生成
-            var sql = new InsertDBCommandBuilder();
 
             for (var i = 0; i < Value.Count; i++)
             {
                 sql.ClearCommand();
-                sql.TableName = TableName;
                 sql.AddInsertColumn(ColumnName, Value[i]);
 
                 InsertBatch += sql.BuildCommand() + ";";
             }
 
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            var result = _database.ExecueCommand(InsertBatch, _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
+            return this;
         }
     }
 }

@@ -10,30 +10,36 @@ namespace DatabaseMaster2
     {
         private ConnectionConfig _connectionConfig;
         private DatabaseInterface _database;
+        private UpdateDBCommandBuilder sql = new UpdateDBCommandBuilder();
 
-        public DatabaseUpdateData(ConnectionConfig config, DatabaseInterface database)
+        public DatabaseUpdateData(ConnectionConfig config, DatabaseInterface database, String
+            TableName)
         {
             _connectionConfig = config;
             _database = database;
+            if (!String.IsNullOrEmpty(TableName))
+                sql.TableName = TableName;
+        }
+
+        /// <summary>
+        /// clear filter
+        /// 清除过滤条件
+        /// </summary>
+        /// <returns></returns>
+        public DatabaseUpdateData Clear()
+        {
+            sql.ClearCommand();
+
+            return this;
         }
 
         /// <summary>
         /// update new data
         /// 更新数据
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
         /// <returns></returns>
-        public int Data(string TableName, string[] ColumnName, object[] Value, string KeyColumnName,
-            object KeyValue)
+        public Int32 ExecuteCommand()
         {
-            //sql生成
-            var sql = new UpdateDBCommandBuilder();
-            sql.TableName = TableName;
-            sql.AddUpdateColumn(ColumnName, Value);
-            sql.AddWhere(WhereRelation.None, KeyColumnName, CommandComparison.Equals, KeyValue);
-
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
                 if (_database.CheckStatus() == false)
@@ -44,8 +50,20 @@ namespace DatabaseMaster2
             var result = _database.ExecueCommand(sql.BuildCommand(), _connectionConfig.WaitTimeout);
             if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
 
+
             return result;
         }
+
+        /// <summary>
+        /// update new data
+        /// 更新数据
+        /// </summary>
+        /// <returns></returns>
+        public Boolean ExecuteCommandChanged()
+        {
+            return ExecuteCommand() > 0;
+        }
+
 
         /// <summary>
         /// Execue Transaction
@@ -55,7 +73,7 @@ namespace DatabaseMaster2
         /// <param name="ColumnName"></param>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public int ExecueTransactionCommand(string[] Command)
+        public Int32 ExecueTransactionCommand(string[] Command)
         {
             //数据库连接
             if (_connectionConfig.IsAutoCloseConnection == false)
@@ -71,68 +89,64 @@ namespace DatabaseMaster2
         }
 
         /// <summary>
-        /// update many new data
-        /// 更新多个数据
+        /// update new data
+        /// 更新数据内容
         /// </summary>
-        /// <param name="TableName"></param>
         /// <param name="ColumnName"></param>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public int Data(string TableName, string[] ColumnName, object[] Value, string[] KeyColumnName,
-            object[] KeyValue)
+        public DatabaseUpdateData Data(string[] ColumnName, object[] Value)
         {
-            //sql生成
-            var sql = new UpdateDBCommandBuilder();
-            sql.TableName = TableName;
             sql.AddUpdateColumn(ColumnName, Value);
 
-            for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
-
-
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
-
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
-
-            var result = _database.ExecueCommand(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
+            return this;
         }
 
         /// <summary>
-        /// update many new data
-        /// 更新多个数据
+        /// update new data
+        /// 更新数据条件
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="ColumnName"></param>
-        /// <param name="Value"></param>
+        /// <param name="KeyColumnName"></param>
+        /// <param name="KeyValue"></param>
         /// <returns></returns>
-        public int Data(string TableName, string[] ColumnName, object[] Value, string[] KeyColumnName,
-            CommandComparison[] comparison, object[] KeyValue)
+        public DatabaseUpdateData Where(string KeyColumnName,object KeyValue)
         {
-            //sql生成
-            var sql = new UpdateDBCommandBuilder();
-            sql.TableName = TableName;
-            sql.AddUpdateColumn(ColumnName, Value);
+            sql.AddWhere(WhereRelation.And, KeyColumnName, CommandComparison.Equals, KeyValue);
 
+           
+            return this;
+        }
+
+
+        /// <summary>
+        /// update new data
+        /// 更新数据条件
+        /// </summary>
+        /// <param name="KeyColumnName"></param>
+        /// <param name="KeyValue"></param>
+        /// <returns></returns>
+        public DatabaseUpdateData Where(string[] KeyColumnName, object[] KeyValue)
+        {
             for (var i = 0; i < KeyColumnName.Length; i++)
-                sql.AddWhere(WhereRelation.And, KeyColumnName[i], (CommandComparison) comparison[i], KeyValue[i]);
+                sql.AddWhere(WhereRelation.And, KeyColumnName[i], CommandComparison.Equals, KeyValue[i]);
 
-            //数据库连接
-            if (_connectionConfig.IsAutoCloseConnection == false)
-                if (_database.CheckStatus() == false)
-                    throw new Exception("databse connect not open");
+            return this;
+        }
 
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+        /// <summary>
+        /// update new data
+        /// 更新数据条件
+        /// </summary>
+        /// <param name="KeyColumnName"></param>
+        /// <param name="comparison"></param>
+        /// <param name="KeyValue"></param>
+        /// <returns></returns>
+        public DatabaseUpdateData Where(string[] KeyColumnName,CommandComparison[] comparison, object[] KeyValue)
+        {
+            for (var i = 0; i < KeyColumnName.Length; i++)
+                sql.AddWhere(WhereRelation.And, KeyColumnName[i], comparison[i], KeyValue[i]);
 
-            var result = _database.ExecueCommand(sql.BuildCommand(), _connectionConfig.WaitTimeout);
-            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
-
-            return result;
+            return this;
         }
     }
 }

@@ -54,6 +54,7 @@ namespace DatabaseMaster2
             return result;
         }
 
+
      
 
         /// <summary>
@@ -136,19 +137,31 @@ namespace DatabaseMaster2
         /// <param name="ColumnName"></param>
         /// <param name="Value"></param>
         /// <returns></returns>
-        public DatabaseInsertData Data(string[] ColumnName, List<object[]> Value)
+        public Int32 ExecuteCommand(string[] ColumnName, List<object[]> Value)
         {
             var InsertBatch = "";
 
             for (var i = 0; i < Value.Count; i++)
             {
-                sql.ClearCommand();
-                sql.AddInsertColumn(ColumnName, Value[i]);
+                InsertDBCommandBuilder sql1 = new InsertDBCommandBuilder();
+                sql1.TableName = sql.TableName;
+                sql1.AddInsertColumn(ColumnName, Value[i]);
 
-                InsertBatch += sql.BuildCommand() + ";";
+                InsertBatch += sql1.BuildCommand() + ";";
             }
 
-            return this;
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+
+            var result = _database.ExecueCommand(InsertBatch, _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+
+            return result;
         }
     }
 }

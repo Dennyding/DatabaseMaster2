@@ -370,8 +370,8 @@ namespace DatabaseMaster2
                 throw new Exception("Connection has not opened.");
             }
 
+            SQLiteTransaction tran = conn.BeginTransaction();
 
-           
             for (int i = 0; i < Command.Length; i++)
             {
                 SQLiteCommand cmd = new SQLiteCommand(Command[i], conn);
@@ -383,6 +383,8 @@ namespace DatabaseMaster2
 
                 cmd.Dispose();
             }
+
+            tran.Commit();
 
             return Value;
         }

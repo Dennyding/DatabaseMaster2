@@ -163,5 +163,39 @@ namespace DatabaseMaster2
 
             return result;
         }
+
+        /// <summary>
+        /// insert many new data
+        /// 插入多个新数据
+        /// </summary>
+        /// <param name="ColumnName"></param>
+        /// <param name="Value"></param>
+        /// <returns></returns>
+        public Int32 ExecueTransactionCommand(string[] ColumnName, List<object[]> Value)
+        {
+            var InsertBatch = "";
+
+            for (var i = 0; i < Value.Count; i++)
+            {
+                InsertDBCommandBuilder sql1 = new InsertDBCommandBuilder();
+                sql1.TableName = sql.TableName;
+                sql1.AddInsertColumn(ColumnName, Value[i]);
+
+                InsertBatch += sql1.BuildCommand() + ";";
+            }
+
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
+
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+
+            var result = _database.ExecueTransactionCommand(new String[] { InsertBatch }, _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+
+            return result;
+        }
     }
 }

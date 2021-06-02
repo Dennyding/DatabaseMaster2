@@ -18,8 +18,12 @@ namespace DatabaseMaster2
         {
             _connectionConfig = config;
             _database = database;
+
+            sql = new DeleteDBCommandBuilder((DatabaseType)Enum.Parse(typeof(DatabaseType), config.DBType));
+
             if (!String.IsNullOrEmpty(TableName))
                 sql.TableName=TableName;
+
         }
 
         /// <summary>

@@ -446,6 +446,49 @@ namespace DatabaseMaster2
             return Value;
         }
 
+
+        /// <summary>
+        /// Execue sql Command With Parameter
+        /// </summary>
+        /// <param name="Command">SQL command String</param>
+        /// <param name="Parameter">Parameter</param>
+        /// <param name="Timeout">[option] timeout of database connect(seconds)</param>
+        /// <returns>
+        /// The number of rows affected 
+        /// </returns>
+        public Int32 ExecueCommand(String Command, ParameterINClass[] Parameter, Int32 Timeout = 30)
+        {
+            Int32 Value;
+
+            if (conn == null)
+            {
+                throw new Exception("Connection has not initialize.");
+            }
+
+            if (conn.State != ConnectionState.Open)
+            {
+                throw new Exception("Connection has not opened.");
+            }
+
+            SqlCommand cmd = new SqlCommand(Command, conn);
+
+            //add parameter
+            cmd.CommandTimeout = Timeout;
+
+            SqlParameter[] para = new SqlParameter[Parameter.Length];
+            for (int number = 0; number < Parameter.Length; number++)
+            {
+                para[0]=new SqlParameter(Parameter[number].ParameterName,Parameter[number].SqlDbType);
+                para[0].Value = Parameter[number].Value;
+            }
+
+            cmd.Parameters.AddRange(para);
+            Value = cmd.ExecuteNonQuery();
+            cmd.Dispose();
+
+            return Value;
+        }
+
         /// <summary>
         /// Execue sql Command With Parameter
         /// </summary>

@@ -17,6 +17,9 @@ namespace DatabaseMaster2
         {
             _connectionConfig = config;
             _database = database;
+
+            sql = new InsertDBCommandBuilder((DatabaseType)Enum.Parse(typeof(DatabaseType), config.DBType));
+
             if (!String.IsNullOrEmpty(TableName))
                 sql.TableName = TableName;
         }
@@ -54,8 +57,28 @@ namespace DatabaseMaster2
             return result;
         }
 
+        /// <summary>
+        /// update new data
+        /// 更新数据
+        /// </summary>
+        /// <returns></returns>
+        public Int32 ExecuteParameterCommand(ParameterINClass[] Parameter)
+        {
+            //数据库连接
+            if (_connectionConfig.IsAutoCloseConnection == false)
+                if (_database.CheckStatus() == false)
+                    throw new Exception("databse connect not open");
 
-     
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Open();
+
+            String s = sql.BuildCommand();
+            var result = _database.ExecueCommand(sql.BuildCommand(), Parameter, _connectionConfig.WaitTimeout);
+            if (_connectionConfig.IsAutoCloseConnection == true) _database.Close();
+
+
+            return result;
+        }
+
 
         /// <summary>
         /// update new data

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,20 +21,46 @@ namespace DatabaseTest
                 //StringEncrypt.DataEncrypt(StringEncrypt.EncryptType.MD5,
                 //    "server=135.251.245.8;Data Source=Test;uid=HR;pwd=hr;");
 
-                //DatabaseConfigXml.SetStringEncrypt();
-                //DatabaseMaster data = new DatabaseMaster(
-                //    new ConnectionConfig()
-                //    {
-                //        //ConnectionString = "server=135.251.245.8;Data Source=Test;uid=HR;pwd=hr;";
-                //        ConnectionString =
-                //            DatabaseConfigXml.GetDbConfigXml(
-                //                    "DatabaseConfig.xml",
-                //                    "SQLite",
-                //                    "ConnectString",
-                //                    StringEncrypt.EncryptType.None),
-                //        DBType = DatabaseType.SQLite.ToString(),
-                //        IsAutoCloseConnection = true
-                //    });
+                DatabaseConfigXml.SetStringEncrypt();
+                DatabaseMaster data = new DatabaseMaster(
+                    new ConnectionConfig()
+                    {
+                        ConnectionString = "Data Source=127.0.0.1;database=LabelMaster2;uid=Test;pwd=ioedu#2345",
+                        //ConnectionString =
+                        //    DatabaseConfigXml.GetDbConfigXml(
+                        //            "DatabaseConfig.xml",
+                        //            "SQLite",
+                        //            "ConnectString",
+                        //            StringEncrypt.EncryptType.None),
+                        DBType = DatabaseType.MSSQL.ToString(),
+                        IsAutoCloseConnection = true
+                    });
+
+                //FileInfo fi = new FileInfo("D:\\Downloads\\MU400_SGWM_E50_V4.0.dbc");
+                //byte[] buff = new byte[fi.Length];
+
+                //FileStream fs = fi.OpenRead();
+                //fs.Read(buff, 0, Convert.ToInt32(fs.Length));
+                //fs.Close();
+
+                //ParameterINClass[] para = new ParameterINClass[1];
+                //para[0].SqlDbType = SqlDbType.Binary;
+                //para[0].ParameterName = "@File";
+                //para[0].Value = buff;
+                //data.Insertable("Label_Table").Data(new String[] { "Label_Name", "Lable_TypeID", "Label_Desp", "Label_CreateTime", "Label_Creater", "Label_File" , "Label_Enable" }
+                //, new Object[] {"AA",1,"a",DateTime.Now,"A","@File",1 }).ExecuteParameterCommand(para);
+                //data.Updateable("Label_Table").Data(new String[] { "Label_File" }, new Object[] {"@File" }).Where("Label_ID", 1).ExecuteCommand(para);
+
+                //DataTable dt = data.Queryable("Label_Table").Columns().Data().ToDataTable();
+
+                //byte[] buff = (Byte[])dt.Rows[0]["Label_File"];
+
+                //FileStream fs = new FileStream("D:\\Downloads\\aa.dbc", FileMode.CreateNew);
+                //BinaryWriter bw = new BinaryWriter(fs);
+                //bw.Write(buff, 0, buff.Length);
+                //bw.Close();
+                //fs.Close();
+
                 //data.Queryable("TestCase_List_Table")
                 //    .Columns()
                 //   .Where("Product_ID", 1)

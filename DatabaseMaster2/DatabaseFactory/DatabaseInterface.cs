@@ -454,6 +454,22 @@ namespace DatabaseMaster2
     }
 
     /// <summary>
+    /// input parameter
+    /// 输入参数
+    /// </summary>
+    public struct ParameterINClass
+    {
+        public String ParameterName;
+        public DbType SqliteDbType;
+        public SqlDbType SqlDbType;
+        public MySqlType MySqlDbType;
+        public OracleType OracleDbType;
+        public NpgsqlType NpgsqlDbType;
+        public object Value;
+    }
+
+
+    /// <summary>
     /// output parameter
     /// 输出参数
     /// </summary>
@@ -599,17 +615,28 @@ namespace DatabaseMaster2
         /// </returns>
         Int32 ExecueCommand( String Command, ParameterClass[] Parameter, Int32 Timeout = 30);
 
-         /// <summary>
-         /// Execue sql Command With Parameter
-         /// </summary>
-         /// <param name="StoreProCommand">SQL command String</param>
-         /// <param name="ParameterIn">Parameter of Input</param>
-         ///  <param name="ParameterOut">Parameter of Output</param>
-         /// <param name="Timeout">[option] timeout of database connect(seconds)</param>
-         /// <returns>
-         /// The parameter of output
-         /// </returns>
-         String[] ExecueStoreProCommand( String StoreProCommand,
+        /// <summary>
+        /// Execue sql Command With Parameter
+        /// </summary>
+        /// <param name="Command">SQL command String</param>
+        /// <param name="Parameter">Parameter</param>
+        /// <param name="Timeout">[option] timeout of database connect(seconds)</param>
+        /// <returns>
+        /// The number of rows affected 
+        /// </returns>
+        Int32 ExecueCommand(String Command, ParameterINClass[] Parameter, Int32 Timeout = 30);
+
+        /// <summary>
+        /// Execue sql Command With Parameter
+        /// </summary>
+        /// <param name="StoreProCommand">SQL command String</param>
+        /// <param name="ParameterIn">Parameter of Input</param>
+        ///  <param name="ParameterOut">Parameter of Output</param>
+        /// <param name="Timeout">[option] timeout of database connect(seconds)</param>
+        /// <returns>
+        /// The parameter of output
+        /// </returns>
+        String[] ExecueStoreProCommand( String StoreProCommand,
             ParameterClass[] ParameterIn, ParameterOutClass[] ParameterOut, Int32 Timeout = 30);
 
          /// <summary>

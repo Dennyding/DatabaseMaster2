@@ -17,16 +17,25 @@ namespace DatabaseMaster2
         {
             _connectionConfig = config;
             _database = database;
-            if(!String.IsNullOrEmpty(TableName))
+
+            sql = new SelectDBCommandBuilder((DatabaseType)Enum.Parse(typeof(DatabaseType), config.DBType));
+
+            if (!String.IsNullOrEmpty(TableName))
                 sql.AddSelectTable(TableName);
+
         }
 
         public DatabaseGetData(ConnectionConfig config, DatabaseInterface database, List<string> TableName)
         {
             _connectionConfig = config;
             _database = database;
+
+
+            sql = new SelectDBCommandBuilder((DatabaseType)Enum.Parse(typeof(DatabaseType), config.DBType));
+
             if (TableName.Count>0)
                 sql.AddSelectTable(TableName);
+
         }
 
 

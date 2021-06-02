@@ -145,6 +145,9 @@ namespace DatabaseMaster2
             if (value.ToString().StartsWith("(") && value.ToString().EndsWith(")"))
                 return false;
 
+            if (value.ToString().StartsWith("@"))
+                return false;
+
 
             if (type.Contains("String")||type.Contains("Char"))
             {
